@@ -1,4 +1,4 @@
-OMKit
+SOCKit
 =====
 
-An Object Routing Kit for Objective-C.
+String <-> Object Coder for Objective-C.
