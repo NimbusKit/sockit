@@ -37,19 +37,12 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 @interface SOCParameter : NSObject {
 @private
   NSString* _string;
-  BOOL _isOutbound;
 }
 
 - (id)initWithString:(NSString *)string;
 + (id)parameterWithString:(NSString *)string;
 
 - (NSString *)string;
-
-- (BOOL)isOutbound; // E.g. @"initWithValue:"
-- (BOOL)isInbound;  // E.g. @"value"
-
-// Private
-- (void)_compileParameter;
 
 @end
 
@@ -74,8 +67,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 - (void)dealloc {
   [_patternString release]; _patternString = nil;
   [_tokens release]; _tokens = nil;
-  [_inboundParameters release]; _inboundParameters = nil;
-  [_outboundParameters release]; _outboundParameters = nil;
+  [_parameters release]; _parameters = nil;
   [super dealloc];
 }
 
@@ -103,27 +95,37 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+- (NSCharacterSet *)nonParameterCharacterSet {
+  NSMutableCharacterSet* parameterCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
+  [parameterCharacterSet addCharactersInString:@".@_"];
+  NSCharacterSet* nonParameterCharacterSet = [parameterCharacterSet invertedSet];
+  return nonParameterCharacterSet;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)_compilePattern {
   if ([_patternString length] == 0) {
     return;
   }
 
   NSMutableArray* tokens = [[NSMutableArray alloc] init];
-  NSMutableSet* inboundParameters = [[NSMutableSet alloc] init];
-  NSMutableArray* outboundParameters = [[NSMutableArray alloc] init];
+  NSMutableSet* parameters = [[NSMutableSet alloc] init];
+
+  NSCharacterSet* nonParameterCharacterSet = [self nonParameterCharacterSet];
 
   // Scan through the string, creating tokens that are either strings or parameters.
-  // Parameters are surrounded by parenthesis and must not be nested.
+  // Parameters are prefixed with ":".
   NSScanner* scanner = [NSScanner scannerWithString:_patternString];
+
   // NSScanner skips whitespace and newlines by default (not ideal!).
   [scanner setCharactersToBeSkipped:nil];
+
   while (![scanner isAtEnd]) {
     NSString* token = nil;
-    [scanner scanUpToString:@"(" intoString:&token];
+    [scanner scanUpToString:@":" intoString:&token];
 
     if ([token length] > 0) {
-      NSAssert([token rangeOfString:@")"].length == 0, @"A dangling parenthesis was found.");
-
       [tokens addObject:token];
     }
 
@@ -131,66 +133,44 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
       // Skip the opening bracket.
       [scanner setScanLocation:[scanner scanLocation] + 1];
 
-      [scanner scanUpToString:@")" intoString:&token];
+      // scanning won't modify the token if there aren't any characters to be read, so we must
+      // clear it before scanning.
+      token = nil;
+      [scanner scanUpToCharactersFromSet:nonParameterCharacterSet intoString:&token];
 
-      NSAssert(![scanner isAtEnd], @"A parameter was not properly terminated with a closing ).");
-      NSAssert([token length] > 0, @"A parameter was empty.");
-      NSAssert([token rangeOfString:@"("].length == 0, @"Nested parenthesis are not permitted.");
+      if ([token length] > 0) {
+        SOCParameter* parameter = [SOCParameter parameterWithString:token];
+        [parameters addObject:parameter];
+        [tokens addObject:parameter];
 
-      SOCParameter* parameter = [SOCParameter parameterWithString:token];
-      if ([parameter isInbound]) {
-        [inboundParameters addObject:parameter];
       } else {
-        [outboundParameters addObject:parameter];
+        [tokens addObject:@":"];
       }
-      [tokens addObject:parameter];
-
-      // Skip the closing bracket.
-      [scanner setScanLocation:[scanner scanLocation] + 1];
     }
   }
 
-  // Enforce one of: only inbound, only outbound, or no parameters.
-  NSAssert([inboundParameters count] > 0 && [outboundParameters count] == 0
-           || [inboundParameters count] == 0 && [outboundParameters count] > 0
-           || [inboundParameters count] == 0 && [outboundParameters count] == 0,
-           @"All parameters must either be inbound or outbound in the pattern string: \"%@\".", _patternString);
-
   // This is an outbound pattern.
-  if ([outboundParameters count] > 0) {
+  if ([parameters count] > 0) {
     BOOL lastWasParameter = NO;
     for (id token in tokens) {
       if ([token isKindOfClass:[SOCParameter class]]) {
-        NSAssert(!lastWasParameter, @"Outbound parameters must be separated by non-parameter strings.");
+        NSAssert(!lastWasParameter, @"Parameters must be separated by non-parameter characters.");
         lastWasParameter = YES;
 
       } else {
         lastWasParameter = NO;
       }
     }
-
-    // Compile the outbound selector.
-    NSMutableString* selectorString = [[NSMutableString alloc] init];
-    for (SOCParameter* parameter in outboundParameters) {
-      [selectorString appendString:parameter.string];
-    }
-    _outboundSelector = NSSelectorFromString(selectorString);
-    [selectorString release]; selectorString = nil;
   }
 
   [_tokens release];
   _tokens = [tokens copy];
-  [_inboundParameters release]; _inboundParameters = nil;
-  if ([inboundParameters count] > 0) {
-    _inboundParameters = [inboundParameters copy];
-  }
-  [_outboundParameters release]; _outboundParameters = nil;
-  if ([outboundParameters count] > 0) {
-    _outboundParameters = [outboundParameters copy];
+  [_parameters release]; _parameters = nil;
+  if ([parameters count] > 0) {
+    _parameters = [parameters copy];
   }
   [tokens release]; tokens = nil;
-  [inboundParameters release]; inboundParameters = nil;
-  [outboundParameters release]; outboundParameters = nil;
+  [parameters release]; parameters = nil;
 }
 
 
@@ -342,12 +322,6 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (id)performPatternSelectorOnObject:(id)object sourceString:(NSString *)sourceString {
-  return [self performSelector:_outboundSelector onObject:object sourceString:sourceString];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)performSelector:(SEL)selector onObject:(id)object sourceString:(NSString *)sourceString {
   BOOL isInitializer = [NSStringFromSelector(selector) hasPrefix:@"init"] && [object class] == object;
 
@@ -383,10 +357,9 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
   }
 
   NSMutableDictionary* parameterValues =
-  [NSMutableDictionary dictionaryWithCapacity:[_inboundParameters count]];
-  for (SOCParameter* parameter in _inboundParameters) {
-    NSString* stringValue =
-    [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
+  [NSMutableDictionary dictionaryWithCapacity:[_parameters count]];
+  for (SOCParameter* parameter in _parameters) {
+    NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
     [parameterValues setObject:stringValue forKey:parameter.string];
   }
 
@@ -412,94 +385,52 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation SOCParameter
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
   [_string release]; _string = nil;
   [super dealloc];
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)initWithString:(NSString *)string {
   if ((self = [super init])) {
     _string = [string copy];
-    [self _compileParameter];
   }
   return self;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 + (id)parameterWithString:(NSString *)string {
   return [[[self alloc] initWithString:string] autorelease];
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString *)description {
-  return [NSString stringWithFormat:
-          @"Parameter: %@ %@",
-          _string,
-          (_isOutbound ? @"outbound" : @"inbound")];
+  return [NSString stringWithFormat:@"Parameter: %@", _string];
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)_compileParameter {
-  if ([_string hasSuffix:@":"]) {
-    _isOutbound = YES;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString *)string {
   return [[_string retain] autorelease];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)isOutbound {
-  return _isOutbound;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)isInbound {
-  return !_isOutbound;
 }
 
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType) {
-  if (argType == 'c'
-      || argType == 'i'
-      || argType == 's'
-      || argType == 'l'
-      || argType == 'C'
-      || argType == 'I'
-      || argType == 'S'
-      || argType == 'L') {
+  if (argType == 'c' || argType == 'i' || argType == 's' || argType == 'l' || argType == 'C'
+      || argType == 'I' || argType == 'S' || argType == 'L') {
     return SOCArgumentTypeInteger;
-    
+
   } else if (argType == 'q' || argType == 'Q') {
     return SOCArgumentTypeLongLong;
-    
+
   } else if (argType == 'f') {
     return SOCArgumentTypeFloat;
-    
+
   } else if (argType == 'd') {
     return SOCArgumentTypeDouble;
-    
+
   } else if (argType == 'B') {
     return SOCArgumentTypeBool;
-    
+
   } else {
     return SOCArgumentTypePointer;
   }

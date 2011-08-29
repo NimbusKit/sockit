@@ -87,22 +87,7 @@ typedef void (^SimpleBlock)(void);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testFailureCases {
-  STAssertThrows([SOCPattern patternWithString:@"()"], @"Empty parameters are not allowed.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly)()"], @"Empty parameters are not allowed.");
-
-  STAssertThrows([SOCPattern patternWithString:@")"], @"Dangling parenthesis.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly))"], @"Dangling parenthesis.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly)/)"], @"Dangling parenthesis.");
-
-  STAssertThrows([SOCPattern patternWithString:@"("], @"No closing parenthesis.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly)("], @"No closing parenthesis.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly)/("], @"No closing parenthesis.");
-
-  STAssertThrows([SOCPattern patternWithString:@"(())"], @"Nested parameters are not allowed.");
-  STAssertThrows([SOCPattern patternWithString:@"((dilly))"], @"Nested parameters are not allowed.");
-  STAssertThrows([SOCPattern patternWithString:@"(dilly(dilly)dilly)"], @"Nested parameters are not allowed.");
-
-  STAssertThrows([SOCPattern patternWithString:@"(initWithId:)(cat:)"], @"Outbound parameters must be separated by strings.");
+  STAssertThrows([SOCPattern patternWithString:@":dilly:isacat"], @"Parameters must be separated by strings.");
 }
 
 
@@ -112,9 +97,9 @@ typedef void (^SimpleBlock)(void);
                        [NSNumber numberWithInt:1337], @"leet",
                        [NSNumber numberWithInt:5000], @"five",
                        nil];
-  STAssertTrue([SOCStringFromStringWithObject(@"(leet)", obj) isEqualToString:@"1337"], @"Should be the same string.");
-  STAssertTrue([SOCStringFromStringWithObject(@"(five)", obj) isEqualToString:@"5000"], @"Should be the same string.");
-  STAssertTrue([SOCStringFromStringWithObject(@"(six)", obj) isEqualToString:@"(null)"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet", obj) isEqualToString:@"1337"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":five", obj) isEqualToString:@"5000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":six", obj) isEqualToString:@"(null)"], @"Should be the same string.");
 }
 
 
@@ -124,9 +109,9 @@ typedef void (^SimpleBlock)(void);
                        [NSNumber numberWithInt:1337], @"leet",
                        [NSNumber numberWithInt:5000], @"five",
                        nil];
-  STAssertTrue([SOCStringFromStringWithObject(@"(leet)(five)", obj) isEqualToString:@"13375000"], @"Should be the same string.");
-  STAssertTrue([SOCStringFromStringWithObject(@"(five)(five)", obj) isEqualToString:@"50005000"], @"Should be the same string.");
-  STAssertTrue([SOCStringFromStringWithObject(@"(five)/(five)/(five)/(five)/(five)/(five)", obj) isEqualToString:@"5000/5000/5000/5000/5000/5000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet/:five", obj) isEqualToString:@"1337/5000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":five/:five", obj) isEqualToString:@"5000/5000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":five/:five/:five/:five/:five/:five", obj) isEqualToString:@"5000/5000/5000/5000/5000/5000"], @"Should be the same string.");
 }
 
 
@@ -136,13 +121,13 @@ typedef void (^SimpleBlock)(void);
                        [NSNumber numberWithInt:1337], @"leet",
                        [NSNumber numberWithInt:5000], @"five",
                        nil];
-  STAssertTrue([SOCStringFromStringWithObject(@"(@count)", obj) isEqualToString:@"2"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":@count", obj) isEqualToString:@"2"], @"Should be the same string.");
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testOutboundParameters {
-  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)"];
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://:ident"];
   STAssertTrue([pattern doesStringConform:@"soc://3"], @"String should conform.");
   STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235"], @"String should conform.");
 
@@ -151,7 +136,7 @@ typedef void (^SimpleBlock)(void);
 
   STAssertTrue([pattern doesStringConform:@"soc://joe"], @"String might conform.");
 
-  pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/sandwich"];
+  pattern = [SOCPattern patternWithString:@"soc://:ident/sandwich"];
   STAssertTrue([pattern doesStringConform:@"soc://3/sandwich"], @"String should conform.");
   STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich"], @"String should conform.");
 
@@ -159,7 +144,7 @@ typedef void (^SimpleBlock)(void);
   STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
   STAssertFalse([pattern doesStringConform:@"soc:///sandwich"], @"String should not conform.");
 
-  pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/sandwich/(cat:)"];
+  pattern = [SOCPattern patternWithString:@"soc://:ident/sandwich/:catName"];
   STAssertTrue([pattern doesStringConform:@"soc://3/sandwich/dilly"], @"String should conform.");
   STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/dilly"], @"String should conform.");
 
@@ -172,22 +157,14 @@ typedef void (^SimpleBlock)(void);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testPerformSelectorOnObjectWithSourceString {
-  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/(floatValue:)/(doubleValue:)/(longLongValue:)/(stringValue:)"];
-  SOCTestObject* testObject = [pattern performPatternSelectorOnObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://:ident/:flv/:dv/:llv/:string"];
+  SOCTestObject* testObject = [pattern performSelector:@selector(initWithId:floatValue:doubleValue:longLongValue:stringValue:userInfo:) onObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
   STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
   STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
   STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
   STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
   STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
 
-  testObject = [pattern performSelector:@selector(initWithId:floatValue:doubleValue:longLongValue:stringValue:userInfo:) onObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
-  STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
-  STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
-  STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
-  STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
-  STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
-
-  pattern = [SOCPattern patternWithString:@"soc://(id)/(flv)/(dv)/(llv)/(string)"];
   testObject = [pattern performSelector:@selector(initWithId:floatValue:doubleValue:longLongValue:stringValue:) onObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
   STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
   STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
@@ -195,11 +172,10 @@ typedef void (^SimpleBlock)(void);
   STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
   STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
 
-  pattern = [SOCPattern patternWithString:@"soc://(setIdent:)"];
-  [pattern performPatternSelectorOnObject:testObject sourceString:@"soc://6"];
+  pattern = [SOCPattern patternWithString:@"soc://:ident"];
+  [pattern performSelector:@selector(setIdent:) onObject:testObject sourceString:@"soc://6"];
   STAssertEquals(testObject.ident, (NSInteger)6, @"Values should be equal.");
 
-  pattern = [SOCPattern patternWithString:@"soc://(setIdent:)"];
   [pattern performSelector:@selector(setLlv:) onObject:testObject sourceString:@"soc://6"];
   STAssertEquals(testObject.llv, (long long)6, @"Values should be equal.");
 }

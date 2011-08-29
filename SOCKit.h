@@ -17,80 +17,76 @@
 #import <Foundation/Foundation.h>
 
 /**
- * A convenience method for:
- *
- * SOCPattern* pattern = [SOCPattern patternWithString:string];
- * NSString* result = [pattern stringFromObject:object];
- *
- * @see documentation for stringFromObject:
- */
-NSString* SOCStringFromStringWithObject(NSString* string, id object);
-
-/**
  * String <-> Object Coding.
  *
- * Easily extract information from strings into objects and vice versa using KVC.
+ * Code information from strings into objects and vice versa.
+ *
+ * A pattern is a string with parameter names prefixed by colons (":").
+ * An example of a pattern string with one parameter named :username is:
+ * api.github.com/users/:username/gists
+ *
+ * Patterns, once created, can be used to efficiently turn objects into strings and
+ * vice versa. Respectively, these techniques are referred to as inbound and outbound.
+ *
+ * Inbound example (turn an object into a string):
+ *
+ *   pattern: api.github.com/users/:username/gists
+ *   > [pattern stringFromObject:githubUser];
+ *   returns: api.github.com/users/jverkoey/gists
+ *
+ *   pattern: api.github.com/repos/:username/:repo/issues
+ *   > [pattern stringFromObject:githubRepo];
+ *   returns: api.github.com/repos/jverkoey/sockit/issues
+ *
+ * Outbound example (turn a string into an object):
+ *
+ *   pattern: github.com/:username
+ *   > [pattern performSelector:@selector(initWithUsername:) onObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
+ *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" passed
+ *            to the initWithUsername: method.
+ *
+ *   pattern: github.com/:username/:repo
+ *   > [pattern performSelector:@selector(initWithUsername:repoName:) onObject:[GithubUser class] sourceString:@"github.com/jverkoey/sockit"];
+ *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" and
+ *            @"sockit" passed to the initWithUsername:repoName: method.
+ *
+ *   pattern: github.com/:username
+ *   > [pattern performSelector:@selector(setUsername:) onObject:githubUser sourceString:@"github.com/jverkoey"];
+ *   returns: nil because setUsername: does not have a return value. githubUser's username property
+ *            is now @"jverkoey".
+ *
+ * Note:
+ *
+ *      Pattern parameters must be separated by some sort of non-parameter character.
+ *      This means that you can't define a pattern like :user:repo. This is because when we
+ *      get around to wanting to decode the string back into an object we need some sort of
+ *      delimiter between the parameters.
+ *
+ * Note 2:
+ *
+ *      If you have colons in your text that aren't followed by a valid parameter name then the
+ *      colon will be treated as static text. This is handy if you're defining a URL pattern.
+ *      For example: @"http://github.com/:user" only has one parameter, :user. The ":" in http://
+ *      is ignored.
  */
 @interface SOCPattern : NSObject {
 @private
   NSString* _patternString;
   NSArray* _tokens;
-
-  // Inbound
-  NSSet* _inboundParameters;
-
-  // Outbound
-  NSArray* _outboundParameters;
-  SEL _outboundSelector;
+  NSSet* _parameters;
 }
 
 /**
- * Initialize a newly allocated pattern object with the given pattern string.
- *
- * A pattern string is a string with parameter names wrapped in parenthesis. Pattern strings
- * are classified into two categories: inbound and outbound.
- *
- * An inbound pattern can use stringFromObject: to create a string with a given object's
- * values.
- *
- * An outbound pattern can use the perform methods to extract values from the string and call
- * selectors on objects.
- *
- * Example inbound patterns:
- *
- *   api.github.com/users/(username)/gists
- *   [pattern stringFromObject:githubUser];
- *   returns: @"api.github.com/users/jverkoey/gists"
- *
- *   api.github.com/repos/(username)/(repo)/issues
- *   [pattern stringFromObject:githubRepo];
- *   returns: @"api.github.com/repos/jverkoey/sockit/issues"
- *
- * Example outbound patterns:
- *
- *   github.com/(initWithUsername:)
- *   [pattern performPatternSelectorOnObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
- *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" passed
- *            to the initWithUsername: method.
- *
- *   github.com/(initWithUsername:)/(repoName:)
- *   [pattern performPatternSelectorOnObject:[GithubUser class] sourceString:@"github.com/jverkoey/sockit"];
- *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" and
- *            @"sockit" passed to the initWithUsername:repoName: method.
- *
- *   github.com/(setUsername:)
- *   [pattern performPatternSelectorOnObject:githubUser sourceString:@"github.com/jverkoey"];
- *   returns: nil because setUsername: does not have a return value. githubUser's username property
- *            is now @"jverkoey".
+ * Initializes a newly allocated pattern object with the given pattern string.
  */
 - (id)initWithString:(NSString *)string;
 + (id)patternWithString:(NSString *)string;
 
 /**
- * Returns YES if the given string can be used with this pattern's perform methods.
+ * Returns YES if the given string can be used with performSelector:onObject:sourceString:
  *
  * A conforming string must exactly match all of the static portions of the pattern and provide
- * values for each of the parenthesized portions.
+ * values for each of the parameters.
  *
  *      @param string  A string that may or may not conform to this pattern.
  *      @returns YES if the given string conforms to this pattern, NO otherwise.
@@ -98,37 +94,27 @@ NSString* SOCStringFromStringWithObject(NSString* string, id object);
 - (BOOL)doesStringConform:(NSString *)string;
 
 /**
- * Performs this pattern's selector on the object with the matching parameter values from
- * sourceString.
- *
- *      @param object  This pattern's selector will be called on this object. If this
- *                     pattern is an initializer pattern and object is a Class then the
- *                     class will be allocated, the selector performed on the allocated
- *                     object, and the initialized object returned.
- *      @param sourceString  A string that conforms to this pattern.
- *      @returns The initialized, autoreleased object if this pattern is an initializer and
- *               object is a Class, otherwise the return value from invoking the selector.
- */
-- (id)performPatternSelectorOnObject:(id)object sourceString:(NSString *)sourceString;
-
-/**
  * Performs the given selector on the object with the matching parameter values from sourceString.
  *
- *      @param selector  The selector to perform on the object.
- *      @param object  The selector will be performed on this object.
- *      @param sourceString  A string that conforms to this pattern. The parameter values from
- *                           this string are used when performing the selector on the object.
- *      @returns The initialized, autoreleased object if the selector is an initializer and
- *               object is a Class, otherwise the return value from invoking the selector.
+ *      @param selector       The selector to perform on the object. If there aren't enough
+ *                            parameters in the pattern then the excess parameters in the selector
+ *                            will be nil.
+ *      @param object         The object to perform the selector on.
+ *      @param sourceString   A string that conforms to this pattern. The parameter values from
+ *                            this string are used as the arguments when performing the selector
+ *                            on the object.
+ *      @returns The initialized, autoreleased object if the selector is an initializer
+ *               (prefixed with "init") and object is a Class, otherwise the return value from
+ *               invoking the selector.
  */
 - (id)performSelector:(SEL)selector onObject:(id)object sourceString:(NSString *)sourceString;
 
 /**
- * Returns a string with the parenthesized portions of this pattern replaced using
- * Key-Value Coding (KVC) on the receiving object.
+ * Returns a string with the parameters of this pattern replaced using Key-Value Coding (KVC)
+ * on the receiving object.
  *
- * Parenthesized portions of the pattern are evaluated using valueForKeyPath:. See Apple's
- * KVC documentation for more details.
+ * Parameters of the pattern are evaluated using valueForKeyPath:. See Apple's KVC documentation
+ * for more details.
  *
  * Key-Value Coding Fundamentals:
  * http://developer.apple.com/library/ios/#documentation/cocoa/conceptual/KeyValueCoding/Articles/BasicPrinciples.html#//apple_ref/doc/uid/20002170-BAJEAIEE
@@ -139,3 +125,13 @@ NSString* SOCStringFromStringWithObject(NSString* string, id object);
 - (NSString *)stringFromObject:(id)object;
 
 @end
+
+/**
+ * A convenience method for:
+ *
+ * SOCPattern* pattern = [SOCPattern patternWithString:string];
+ * NSString* result = [pattern stringFromObject:object];
+ *
+ * @see documentation for stringFromObject:
+ */
+NSString* SOCStringFromStringWithObject(NSString* string, id object);
