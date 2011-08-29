@@ -59,7 +59,7 @@ NSString* SOCStringFromStringWithObject(NSString* string, id object);
  *      @returns The initialized object if this pattern is an initializer and object is a Class,
  *               otherwise nil.
  */
-- (id)performSelectorOnObject:(id)object conformingString:(NSString *)matchingString;
+- (id)performSelectorOnObject:(id)object string:(NSString *)matchingString;
 
 /**
  * Returns a string with the parenthesized portions of this pattern replaced using

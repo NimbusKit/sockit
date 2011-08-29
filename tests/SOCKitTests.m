@@ -15,6 +15,7 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "SOCKit.h"
 
@@ -22,18 +23,35 @@ typedef void (^SimpleBlock)(void);
 
 @interface SOCTestObject : NSObject
 
-- (id)initWithId:(NSInteger)ident;
+- (id)initWithId:(NSInteger)ident floatValue:(CGFloat)flv doubleValue:(double)dv longLongValue:(long long)llv stringValue:(NSString *)string;
 
 @property (nonatomic, readwrite, assign) NSInteger ident;
+@property (nonatomic, readwrite, assign) CGFloat flv;
+@property (nonatomic, readwrite, assign) double dv;
+@property (nonatomic, readwrite, assign) long long llv;
+@property (nonatomic, readwrite, copy) NSString* string;
 @end
 
 @implementation SOCTestObject
 
 @synthesize ident;
+@synthesize flv;
+@synthesize dv;
+@synthesize llv;
+@synthesize string;
 
-- (id)initWithId:(NSInteger)ident {
+- (void)dealloc {
+  [string release]; string = nil;
+  [super dealloc];
+}
+
+- (id)initWithId:(NSInteger)anIdent floatValue:(CGFloat)anFlv doubleValue:(double)aDv longLongValue:(long long)anLlv stringValue:(NSString *)aString {
   if ((self = [super init])) {
-    self.ident = ident;
+    self.ident = anIdent;
+    self.flv = anFlv;
+    self.dv = aDv;
+    self.llv = anLlv;
+    self.string = aString;
   }
   return self;
 }
@@ -118,7 +136,7 @@ typedef void (^SimpleBlock)(void);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)testStringDecoding {
+- (void)testOutboundParameters {
   SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)"];
   STAssertTrue([pattern doesStringConform:@"soc://3"], @"String should conform.");
   STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235"], @"String should conform.");
@@ -144,6 +162,20 @@ typedef void (^SimpleBlock)(void);
   STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
   STAssertFalse([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/"], @"String should not conform.");
   STAssertFalse([pattern doesStringConform:@"soc:///sandwich/"], @"String should not conform.");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testStringDecoding {
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/(floatValue:)/(doubleValue:)/(longLongValue:)/(stringValue:)"];
+  SOCTestObject* testObject = [SOCTestObject alloc];
+  [pattern performSelectorOnObject:testObject string:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
+  STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
+  STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
+  STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
+  STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
+  [testObject release];
 }
 
 @end

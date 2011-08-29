@@ -110,7 +110,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
   NSMutableArray* tokens = [[NSMutableArray alloc] init];
   NSMutableSet* inboundParameters = [[NSMutableSet alloc] init];
-  NSMutableSet* outboundParameters = [[NSMutableSet alloc] init];
+  NSMutableArray* outboundParameters = [[NSMutableArray alloc] init];
 
   // Scan through the string, creating tokens that are either strings or parameters.
   // Parameters are surrounded by parenthesis and must not be nested.
@@ -171,7 +171,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
     
     // Compile the selector.
     NSMutableString* selectorString = [[NSMutableString alloc] init];
-    for (SOCParameter* parameter in _outboundParameters) {
+    for (SOCParameter* parameter in outboundParameters) {
       [selectorString appendString:parameter.string];
     }
     _outboundSelector = NSSelectorFromString(selectorString);
@@ -200,10 +200,15 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)doesStringConform:(NSString *)string {
+- (BOOL)gatherParameterValues:(NSArray**)pValues fromString:(NSString *)string  {
   const NSInteger stringLength = [string length];
   NSInteger validUpUntil = 0;
   NSInteger matchingTokens = 0;
+
+  NSMutableArray* values = nil;
+  if (nil != pValues) {
+    values = [NSMutableArray arrayWithCapacity:[_outboundParameters count]];
+  }
 
   NSInteger tokenIndex = 0;
   for (id token in _tokens) {
@@ -225,6 +230,8 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
       ++matchingTokens;
 
     } else {
+      NSInteger parameterLocation = validUpUntil;
+
       // Look ahead for the next string token match.
       if (tokenIndex + 1 < [_tokens count]) {
         NSString* nextToken = [_tokens objectAtIndex:tokenIndex + 1];
@@ -253,17 +260,107 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
         validUpUntil = stringLength;
         ++matchingTokens;
       }
+
+      NSRange parameterRange = NSMakeRange(parameterLocation, validUpUntil - parameterLocation);
+      [values addObject:[string substringWithRange:parameterRange]];
     }
     
     ++tokenIndex;
   }
+
+  if (nil != pValues) {
+    *pValues = [[values copy] autorelease];
+  }
+  
   return validUpUntil == stringLength && matchingTokens == [_tokens count];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (id)performSelectorOnObject:(id)object conformingString:(NSString *)matchingString {
-  return nil;
+- (BOOL)doesStringConform:(NSString *)string {
+  return [self gatherParameterValues:nil fromString:string];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)setArgument:(NSString*)text withType:(SOCArgumentType)type atIndex:(NSInteger)index forInvocation:(NSInvocation*)invocation {
+  // There are two implicit arguments with an invocation.
+  index+=2;
+
+  switch (type) {
+    case SOCArgumentTypeNone: {
+      break;
+    }
+    case SOCArgumentTypeInteger: {
+      int val = [text intValue];
+      [invocation setArgument:&val atIndex:index];
+      break;
+    }
+    case SOCArgumentTypeLongLong: {
+      long long val = [text longLongValue];
+      [invocation setArgument:&val atIndex:index];
+      break;
+    }
+    case SOCArgumentTypeFloat: {
+      float val = [text floatValue];
+      [invocation setArgument:&val atIndex:index];
+      break;
+    }
+    case SOCArgumentTypeDouble: {
+      double val = [text doubleValue];
+      [invocation setArgument:&val atIndex:index];
+      break;
+    }
+    case SOCArgumentTypeBool: {
+      BOOL val = [text boolValue];
+      [invocation setArgument:&val atIndex:index];
+      break;
+    }
+    default: {
+      [invocation setArgument:&text atIndex:index];
+      break;
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)setArgumentsFromValues:(NSArray *)values forInvocation:(NSInvocation *)invocation {
+  Method method = class_getInstanceMethod([invocation.target class], _outboundSelector);
+  NSAssert(nil != method, @"The method must exist with the given invocation target.");
+
+  for (NSInteger ix = 0; ix < [values count]; ++ix) {
+    NSString* value = [values objectAtIndex:ix];
+
+    char argType[32];
+    method_getArgumentType(method, ix + 2, argType, sizeof(argType) / sizeof(typeof(argType[0])));
+    SOCArgumentType type = SOCArgumentTypeForTypeAsChar(argType[0]);
+
+    [self setArgument:value withType:type atIndex:ix forInvocation:invocation];
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (id)performSelectorOnObject:(id)object string:(NSString *)matchingString {
+  NSArray* values = nil;
+  NSAssert([self gatherParameterValues:&values fromString:matchingString], @"The pattern can't be used with this string.");
+
+  id returnValue = nil;
+
+  NSMethodSignature* sig = [object methodSignatureForSelector:_outboundSelector];
+  NSAssert(nil != sig, @"Object does not respond to selector: '%@'", NSStringFromSelector(_outboundSelector));
+  NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:sig];
+  [invocation setTarget:object];
+  [invocation setSelector:_outboundSelector];
+  [self setArgumentsFromValues:values forInvocation:invocation];
+  [invocation invoke];
+
+  if (sig.methodReturnLength) {
+    [invocation getReturnValue:&returnValue];
+  }
+
+  return returnValue;
 }
 
 

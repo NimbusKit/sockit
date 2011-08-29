@@ -15,9 +15,8 @@
 		660B68A714088B4A00EAAFDC /* libSOCKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B688D14088B4A00EAAFDC /* libSOCKit.a */; };
 		667E34D0140BD732002FD733 /* SOCKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 667E34CE140BD732002FD733 /* SOCKit.h */; };
 		667E34D1140BD732002FD733 /* SOCKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 667E34CF140BD732002FD733 /* SOCKit.m */; };
-		667E34D9140BD75B002FD733 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 667E34D7140BD75B002FD733 /* InfoPlist.strings */; };
 		667E34DB140BD776002FD733 /* SOCKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 667E34DA140BD776002FD733 /* SOCKitTests.m */; };
-		667E34DD140BD77B002FD733 /* SOCKitTests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 667E34DC140BD77B002FD733 /* SOCKitTests-Info.plist */; };
+		66FAD61E140BF5E40015B014 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 667E34D7140BD75B002FD733 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -192,8 +191,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				667E34D9140BD75B002FD733 /* InfoPlist.strings in Resources */,
-				667E34DD140BD77B002FD733 /* SOCKitTests-Info.plist in Resources */,
+				66FAD61E140BF5E40015B014 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
