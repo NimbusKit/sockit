@@ -157,7 +157,18 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
            @"All parameters must either be inbound or outbound in the pattern string: \"%@\".", _patternString);
 
   // This is an outbound pattern.
-  if ([_outboundParameters count] > 0) {
+  if ([outboundParameters count] > 0) {
+    BOOL lastWasParameter = NO;
+    for (id token in tokens) {
+      if ([token isKindOfClass:[SOCParameter class]]) {
+        NSAssert(!lastWasParameter, @"Outbound parameters must be separated by non-parameter strings.");
+        lastWasParameter = YES;
+
+      } else {
+        lastWasParameter = NO;
+      }
+    }
+    
     // Compile the selector.
     NSMutableString* selectorString = [[NSMutableString alloc] init];
     for (SOCParameter* parameter in _outboundParameters) {
@@ -190,11 +201,63 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)doesStringConform:(NSString *)string {
-  BOOL conforms = NO;
+  const NSInteger stringLength = [string length];
+  NSInteger validUpUntil = 0;
+  NSInteger matchingTokens = 0;
+
+  NSInteger tokenIndex = 0;
   for (id token in _tokens) {
+
+    if ([token isKindOfClass:[NSString class]]) {
+      NSInteger tokenLength = [token length];
+      if (validUpUntil + tokenLength > stringLength) {
+        // There aren't enough characters in the string to satisfy this token.
+        break;
+      }
+      if (![[string substringWithRange:NSMakeRange(validUpUntil, tokenLength)]
+            isEqualToString:token]) {
+        // The tokens don't match up.
+        break;
+      }
+
+      // The string token matches.
+      validUpUntil += tokenLength;
+      ++matchingTokens;
+
+    } else {
+      // Look ahead for the next string token match.
+      if (tokenIndex + 1 < [_tokens count]) {
+        NSString* nextToken = [_tokens objectAtIndex:tokenIndex + 1];
+        NSAssert([nextToken isKindOfClass:[NSString class]], @"The token following a parameter must be a string.");
+
+        NSRange nextTokenRange = [string rangeOfString:nextToken options:0 range:NSMakeRange(validUpUntil, stringLength - validUpUntil)];
+        if (nextTokenRange.length == 0) {
+          // Couldn't find the next token.
+          break;
+        }
+        if (nextTokenRange.location == validUpUntil) {
+          // This parameter is empty.
+          break;
+        }
+
+        validUpUntil = nextTokenRange.location;
+        ++matchingTokens;
+
+      } else {
+        // Anything goes until the end of the string then.
+        if (validUpUntil == stringLength) {
+          // The last parameter is empty.
+          break;
+        }
+
+        validUpUntil = stringLength;
+        ++matchingTokens;
+      }
+    }
     
+    ++tokenIndex;
   }
-  return conforms;
+  return validUpUntil == stringLength && matchingTokens == [_tokens count];
 }
 
 

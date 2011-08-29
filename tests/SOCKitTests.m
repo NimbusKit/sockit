@@ -20,6 +20,26 @@
 
 typedef void (^SimpleBlock)(void);
 
+@interface SOCTestObject : NSObject
+
+- (id)initWithId:(NSInteger)ident;
+
+@property (nonatomic, readwrite, assign) NSInteger ident;
+@end
+
+@implementation SOCTestObject
+
+@synthesize ident;
+
+- (id)initWithId:(NSInteger)ident {
+  if ((self = [super init])) {
+    self.ident = ident;
+  }
+  return self;
+}
+
+@end
+
 @interface SOCKitTests : SenTestCase
 @end
 
@@ -58,6 +78,8 @@ typedef void (^SimpleBlock)(void);
   STAssertThrows([SOCPattern patternWithString:@"(())"], @"Nested parameters are not allowed.");
   STAssertThrows([SOCPattern patternWithString:@"((dilly))"], @"Nested parameters are not allowed.");
   STAssertThrows([SOCPattern patternWithString:@"(dilly(dilly)dilly)"], @"Nested parameters are not allowed.");
+
+  STAssertThrows([SOCPattern patternWithString:@"(initWithId:)(cat:)"], @"Outbound parameters must be separated by strings.");
 }
 
 
@@ -92,6 +114,36 @@ typedef void (^SimpleBlock)(void);
                        [NSNumber numberWithInt:5000], @"five",
                        nil];
   STAssertTrue([SOCStringFromStringWithObject(@"(@count)", obj) isEqualToString:@"2"], @"Should be the same string.");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testStringDecoding {
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)"];
+  STAssertTrue([pattern doesStringConform:@"soc://3"], @"String should conform.");
+  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235"], @"String should conform.");
+
+  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
+
+  STAssertTrue([pattern doesStringConform:@"soc://joe"], @"String might conform.");
+
+  pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/sandwich"];
+  STAssertTrue([pattern doesStringConform:@"soc://3/sandwich"], @"String should conform.");
+  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich"], @"String should conform.");
+
+  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc:///sandwich"], @"String should not conform.");
+
+  pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/sandwich/(cat:)"];
+  STAssertTrue([pattern doesStringConform:@"soc://3/sandwich/dilly"], @"String should conform.");
+  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/dilly"], @"String should conform.");
+
+  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/"], @"String should not conform.");
+  STAssertFalse([pattern doesStringConform:@"soc:///sandwich/"], @"String should not conform.");
 }
 
 @end
