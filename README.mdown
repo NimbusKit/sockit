@@ -1,4 +1,59 @@
 SOCKit
-=====
+======
 
-String <-> Object Coder for Objective-C.
+String <-> Object Coding for Objective-C.
+
+With SOCKit and [SOCPattern][] you can easily transform objects into strings and vice versa.
+
+## Two examples, cuz devs love examples.
+
+```obj-c
+SOCPattern* pattern = [SOCPattern patternWithString:@"api.github.com/users/(username)/gists"];
+[pattern stringFromObject:githubUser];
+> @"api.github.com/users/jverkoey/gists"
+```
+
+```obj-c
+SOCPattern* pattern = [SOCPattern patternWithString:@"github.com/(initWithUsername:)"];
+[pattern performPatternSelectorOnObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
+> <GithubUser> username = jverkoey
+```
+
+## Hey, this is really similar to defining routes in Rails
+
+Damn straight it is. There are some differences, though. Parameters in Rails are denoted using
+a colon, like `:this`. SOCKit parameters are denoted using parenthesis, like `(this)`. The reason
+for this is that you can use dot notation in SOCKit to recursively access sub-objects
+from the receiver. You can even perform [KVC collection operators][].
+
+Let's consider a quick Rails example from the Rails docs:
+
+```ruby
+match "/patients/:id" => "patients#show"
+```
+
+The equivalent SOCKit pattern would be:
+
+```obj-c
+[SOCPattern patternWithString:@"/patients/(id)"]; // For creating URLs from patient objects
+
+Patient* patient = [SOCPattern performSelector:@selector(initWithId:) onObject:[Patient class] sourceString:@"/patients/17"];
+patient
+> <Patient> id = 17
+
+[SOCPattern stringFromObject:patient];
+> @"/patients/17"
+```
+
+## Add SOCKit to your project
+
+This lightweight library is built to be a dead-simple airdrop into your project. Contained
+in SOCKit.h and SOCKit.m is all of the functionality you will need in order to start mapping
+Strings <-> Objects. To start using SOCKit, simply download or `git checkout` the sockit repo
+and drag SOCKit.h and SOCKit.m to your project's source tree. `#import "SOCKit.h"` where you want
+to use SOCKit and start pumping out some mad String <-> Object coding.
+
+## Hey, this is 
+
+[SOCPattern]: https://github.com/jverkoey/sockit/blob/master/SOCKit.h
+[KVC collection operators]: http://developer.apple.com/library/ios/#documentation/cocoa/conceptual/KeyValueCoding/Articles/CollectionOperators.html#//apple_ref/doc/uid/20002176-BAJEAIEE

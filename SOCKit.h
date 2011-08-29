@@ -16,8 +16,21 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * A convenience method for:
+ *
+ * SOCPattern* pattern = [SOCPattern patternWithString:string];
+ * NSString* result = [pattern stringFromObject:object];
+ *
+ * @see documentation for stringFromObject:
+ */
 NSString* SOCStringFromStringWithObject(NSString* string, id object);
 
+/**
+ * String <-> Object Coding.
+ *
+ * Easily extract information from strings into objects and vice versa using KVC.
+ */
 @interface SOCPattern : NSObject {
 @private
   NSString* _patternString;
@@ -31,17 +44,53 @@ NSString* SOCStringFromStringWithObject(NSString* string, id object);
   SEL _outboundSelector;
 }
 
+/**
+ * Initialize a newly allocated pattern object with the given pattern string.
+ *
+ * A pattern string is a string with parameter names wrapped in parenthesis. Pattern strings
+ * are classified into two categories: inbound and outbound.
+ *
+ * An inbound pattern can use stringFromObject: to create a string with a given object's
+ * values.
+ *
+ * An outbound pattern can use the perform methods to extract values from the string and call
+ * selectors on objects.
+ *
+ * Example inbound patterns:
+ *
+ *   api.github.com/users/(username)/gists
+ *   [pattern stringFromObject:githubUser];
+ *   returns: @"api.github.com/users/jverkoey/gists"
+ *
+ *   api.github.com/repos/(username)/(repo)/issues
+ *   [pattern stringFromObject:githubRepo];
+ *   returns: @"api.github.com/repos/jverkoey/sockit/issues"
+ *
+ * Example outbound patterns:
+ *
+ *   github.com/(initWithUsername:)
+ *   [pattern performPatternSelectorOnObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
+ *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" passed
+ *            to the initWithUsername: method.
+ *
+ *   github.com/(initWithUsername:)/(repoName:)
+ *   [pattern performPatternSelectorOnObject:[GithubUser class] sourceString:@"github.com/jverkoey/sockit"];
+ *   returns: an allocated, initialized, and autoreleased GithubUser object with @"jverkoey" and
+ *            @"sockit" passed to the initWithUsername:repoName: method.
+ *
+ *   github.com/(setUsername:)
+ *   [pattern performPatternSelectorOnObject:githubUser sourceString:@"github.com/jverkoey"];
+ *   returns: nil because setUsername: does not have a return value. githubUser's username property
+ *            is now @"jverkoey".
+ */
 - (id)initWithString:(NSString *)string;
 + (id)patternWithString:(NSString *)string;
 
 /**
- * Returns YES if the given string conforms to this pattern.
+ * Returns YES if the given string can be used with this pattern's perform methods.
  *
- * A conforming string must match all of the static portions of the pattern and provide values
- * for each of the parenthesized portions.
- *
- * A conforming string can be used as the conformingString in
- * performSelectorWithObject:conformingString:.
+ * A conforming string must exactly match all of the static portions of the pattern and provide
+ * values for each of the parenthesized portions.
  *
  *      @param string  A string that may or may not conform to this pattern.
  *      @returns YES if the given string conforms to this pattern, NO otherwise.
@@ -49,17 +98,30 @@ NSString* SOCStringFromStringWithObject(NSString* string, id object);
 - (BOOL)doesStringConform:(NSString *)string;
 
 /**
- * Performs this pattern's selector on the object with the values retrieved from matchingString.
+ * Performs this pattern's selector on the object with the matching parameter values from
+ * sourceString.
  *
  *      @param object  This pattern's selector will be called on this object. If this
  *                     pattern is an initializer pattern and object is a Class then the
  *                     class will be allocated, the selector performed on the allocated
  *                     object, and the initialized object returned.
- *      @param matchingString  A string that conforms to this pattern.
- *      @returns The initialized object if this pattern is an initializer and object is a Class,
- *               otherwise nil.
+ *      @param sourceString  A string that conforms to this pattern.
+ *      @returns The initialized, autoreleased object if this pattern is an initializer and
+ *               object is a Class, otherwise the return value from invoking the selector.
  */
-- (id)performSelectorOnObject:(id)object string:(NSString *)matchingString;
+- (id)performPatternSelectorOnObject:(id)object sourceString:(NSString *)sourceString;
+
+/**
+ * Performs the given selector on the object with the matching parameter values from sourceString.
+ *
+ *      @param selector  The selector to perform on the object.
+ *      @param object  The selector will be performed on this object.
+ *      @param sourceString  A string that conforms to this pattern. The parameter values from
+ *                           this string are used when performing the selector on the object.
+ *      @returns The initialized, autoreleased object if the selector is an initializer and
+ *               object is a Class, otherwise the return value from invoking the selector.
+ */
+- (id)performSelector:(SEL)selector onObject:(id)object sourceString:(NSString *)sourceString;
 
 /**
  * Returns a string with the parenthesized portions of this pattern replaced using

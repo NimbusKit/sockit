@@ -24,6 +24,7 @@ typedef void (^SimpleBlock)(void);
 @interface SOCTestObject : NSObject
 
 - (id)initWithId:(NSInteger)ident floatValue:(CGFloat)flv doubleValue:(double)dv longLongValue:(long long)llv stringValue:(NSString *)string;
+- (id)initWithId:(NSInteger)ident floatValue:(CGFloat)flv doubleValue:(double)dv longLongValue:(long long)llv stringValue:(NSString *)string userInfo:(id)userInfo;
 
 @property (nonatomic, readwrite, assign) NSInteger ident;
 @property (nonatomic, readwrite, assign) CGFloat flv;
@@ -54,6 +55,10 @@ typedef void (^SimpleBlock)(void);
     self.string = aString;
   }
   return self;
+}
+
+- (id)initWithId:(NSInteger)anIdent floatValue:(CGFloat)anFlv doubleValue:(double)aDv longLongValue:(long long)anLlv stringValue:(NSString *)aString userInfo:(id)userInfo {
+  return [self initWithId:anIdent floatValue:anFlv doubleValue:aDv longLongValue:anLlv stringValue:aString];
 }
 
 @end
@@ -166,16 +171,37 @@ typedef void (^SimpleBlock)(void);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)testStringDecoding {
+- (void)testPerformSelectorOnObjectWithSourceString {
   SOCPattern* pattern = [SOCPattern patternWithString:@"soc://(initWithId:)/(floatValue:)/(doubleValue:)/(longLongValue:)/(stringValue:)"];
-  SOCTestObject* testObject = [SOCTestObject alloc];
-  [pattern performSelectorOnObject:testObject string:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  SOCTestObject* testObject = [pattern performPatternSelectorOnObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
   STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
   STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
   STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
   STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
   STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
-  [testObject release];
+
+  testObject = [pattern performSelector:@selector(initWithId:floatValue:doubleValue:longLongValue:stringValue:userInfo:) onObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
+  STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
+  STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
+  STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
+  STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
+
+  pattern = [SOCPattern patternWithString:@"soc://(id)/(flv)/(dv)/(llv)/(string)"];
+  testObject = [pattern performSelector:@selector(initWithId:floatValue:doubleValue:longLongValue:stringValue:) onObject:[SOCTestObject class] sourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  STAssertEquals(testObject.ident, (NSInteger)3, @"Values should be equal.");
+  STAssertEquals(testObject.flv, (CGFloat)3.5, @"Values should be equal.");
+  STAssertEquals(testObject.dv, 6.14, @"Values should be equal.");
+  STAssertEquals(testObject.llv, (long long)13413143124321, @"Values should be equal.");
+  STAssertTrue([testObject.string isEqualToString:@"dilly"], @"Values should be equal.");
+
+  pattern = [SOCPattern patternWithString:@"soc://(setIdent:)"];
+  [pattern performPatternSelectorOnObject:testObject sourceString:@"soc://6"];
+  STAssertEquals(testObject.ident, (NSInteger)6, @"Values should be equal.");
+
+  pattern = [SOCPattern patternWithString:@"soc://(setIdent:)"];
+  [pattern performSelector:@selector(setLlv:) onObject:testObject sourceString:@"soc://6"];
+  STAssertEquals(testObject.llv, (long long)6, @"Values should be equal.");
 }
 
 @end

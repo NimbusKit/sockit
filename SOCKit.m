@@ -150,7 +150,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
     }
   }
 
-  // Enforce one of only inbound, only outbound, or no parameters.
+  // Enforce one of: only inbound, only outbound, or no parameters.
   NSAssert([inboundParameters count] > 0 && [outboundParameters count] == 0
            || [inboundParameters count] == 0 && [outboundParameters count] > 0
            || [inboundParameters count] == 0 && [outboundParameters count] == 0,
@@ -168,8 +168,8 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
         lastWasParameter = NO;
       }
     }
-    
-    // Compile the selector.
+
+    // Compile the outbound selector.
     NSMutableString* selectorString = [[NSMutableString alloc] init];
     for (SOCParameter* parameter in outboundParameters) {
       [selectorString appendString:parameter.string];
@@ -207,7 +207,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
   NSMutableArray* values = nil;
   if (nil != pValues) {
-    values = [NSMutableArray arrayWithCapacity:[_outboundParameters count]];
+    values = [NSMutableArray array];
   }
 
   NSInteger tokenIndex = 0;
@@ -326,13 +326,13 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setArgumentsFromValues:(NSArray *)values forInvocation:(NSInvocation *)invocation {
-  Method method = class_getInstanceMethod([invocation.target class], _outboundSelector);
+  Method method = class_getInstanceMethod([invocation.target class], invocation.selector);
   NSAssert(nil != method, @"The method must exist with the given invocation target.");
 
   for (NSInteger ix = 0; ix < [values count]; ++ix) {
     NSString* value = [values objectAtIndex:ix];
 
-    char argType[32];
+    char argType[4];
     method_getArgumentType(method, ix + 2, argType, sizeof(argType) / sizeof(typeof(argType[0])));
     SOCArgumentType type = SOCArgumentTypeForTypeAsChar(argType[0]);
 
@@ -342,17 +342,29 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (id)performSelectorOnObject:(id)object string:(NSString *)matchingString {
+- (id)performPatternSelectorOnObject:(id)object sourceString:(NSString *)sourceString {
+  return [self performSelector:_outboundSelector onObject:object sourceString:sourceString];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (id)performSelector:(SEL)selector onObject:(id)object sourceString:(NSString *)sourceString {
+  BOOL isInitializer = [NSStringFromSelector(selector) hasPrefix:@"init"] && [object class] == object;
+
+  if (isInitializer) {
+    object = [[object alloc] autorelease];
+  }
+
   NSArray* values = nil;
-  NSAssert([self gatherParameterValues:&values fromString:matchingString], @"The pattern can't be used with this string.");
+  NSAssert([self gatherParameterValues:&values fromString:sourceString], @"The pattern can't be used with this string.");
 
   id returnValue = nil;
 
-  NSMethodSignature* sig = [object methodSignatureForSelector:_outboundSelector];
-  NSAssert(nil != sig, @"Object does not respond to selector: '%@'", NSStringFromSelector(_outboundSelector));
+  NSMethodSignature* sig = [object methodSignatureForSelector:selector];
+  NSAssert(nil != sig, @"%@ does not respond to selector: '%@'", object, NSStringFromSelector(selector));
   NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:sig];
   [invocation setTarget:object];
-  [invocation setSelector:_outboundSelector];
+  [invocation setSelector:selector];
   [self setArgumentsFromValues:values forInvocation:invocation];
   [invocation invoke];
 
