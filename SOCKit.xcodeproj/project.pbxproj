@@ -73,7 +73,9 @@
 			isa = PBXGroup;
 			children = (
 				661278FA140BD69B00164779 /* README.mdown */,
-				660B689214088B4A00EAAFDC /* SOCKit */,
+				667E34CE140BD732002FD733 /* SOCKit.h */,
+				667E34CF140BD732002FD733 /* SOCKit.m */,
+				667E34DA140BD776002FD733 /* SOCKitTests.m */,
 				660B68A814088B4A00EAAFDC /* SOCKitTests */,
 				660B688F14088B4A00EAAFDC /* Frameworks */,
 				660B688E14088B4A00EAAFDC /* Products */,
@@ -100,33 +102,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		660B689214088B4A00EAAFDC /* SOCKit */ = {
-			isa = PBXGroup;
-			children = (
-				667E34CE140BD732002FD733 /* SOCKit.h */,
-				667E34CF140BD732002FD733 /* SOCKit.m */,
-			);
-			name = SOCKit;
-			path = SOCKit;
-			sourceTree = "<group>";
-		};
 		660B68A814088B4A00EAAFDC /* SOCKitTests */ = {
-			isa = PBXGroup;
-			children = (
-				667E34DA140BD776002FD733 /* SOCKitTests.m */,
-				660B68A914088B4A00EAAFDC /* Supporting Files */,
-			);
-			name = SOCKitTests;
-			path = SOCKitTests;
-			sourceTree = "<group>";
-		};
-		660B68A914088B4A00EAAFDC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
 				667E34DC140BD77B002FD733 /* SOCKitTests-Info.plist */,
 				667E34D7140BD75B002FD733 /* InfoPlist.strings */,
 			);
-			name = "Supporting Files";
+			path = SOCKitTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

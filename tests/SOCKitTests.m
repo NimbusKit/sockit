@@ -60,4 +60,38 @@ typedef void (^SimpleBlock)(void);
   STAssertThrows([SOCPattern patternWithString:@"(dilly(dilly)dilly)"], @"Nested parameters are not allowed.");
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testSingleParameterCoding {
+  NSDictionary* obj = [NSDictionary dictionaryWithObjectsAndKeys:
+                       [NSNumber numberWithInt:1337], @"leet",
+                       [NSNumber numberWithInt:5000], @"five",
+                       nil];
+  STAssertTrue([SOCStringFromStringWithObject(@"(leet)", obj) isEqualToString:@"1337"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"(five)", obj) isEqualToString:@"5000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"(six)", obj) isEqualToString:@"(null)"], @"Should be the same string.");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testMultiParameterCoding {
+  NSDictionary* obj = [NSDictionary dictionaryWithObjectsAndKeys:
+                       [NSNumber numberWithInt:1337], @"leet",
+                       [NSNumber numberWithInt:5000], @"five",
+                       nil];
+  STAssertTrue([SOCStringFromStringWithObject(@"(leet)(five)", obj) isEqualToString:@"13375000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"(five)(five)", obj) isEqualToString:@"50005000"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"(five)/(five)/(five)/(five)/(five)/(five)", obj) isEqualToString:@"5000/5000/5000/5000/5000/5000"], @"Should be the same string.");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testCollectionOperators {
+  NSDictionary* obj = [NSDictionary dictionaryWithObjectsAndKeys:
+                       [NSNumber numberWithInt:1337], @"leet",
+                       [NSNumber numberWithInt:5000], @"five",
+                       nil];
+  STAssertTrue([SOCStringFromStringWithObject(@"(@count)", obj) isEqualToString:@"2"], @"Should be the same string.");
+}
+
 @end
