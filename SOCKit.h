@@ -73,7 +73,7 @@
 @private
   NSString* _patternString;
   NSArray* _tokens;
-  NSSet* _parameters;
+  NSArray* _parameters;
 }
 
 /**
@@ -108,6 +108,17 @@
  *               invoking the selector.
  */
 - (id)performSelector:(SEL)selector onObject:(id)object sourceString:(NSString *)sourceString;
+
+/**
+ * Extracts the matching parameter values from sourceString into an NSDictionary.
+ *
+ *      @param sourceString  A string that conforms to this pattern. The parameter values from
+ *                           this string are extracted into the NSDictionary.
+ *      @returns A dictionary of key value pairs. All values will be NSStrings. The keys will
+ *               correspond to the pattern's parameter names. Duplicate key values will be
+ *               written over by later values.
+ */
+- (NSDictionary *)extractParameterKeyValuesFromSourceString:(NSString *)sourceString;
 
 /**
  * Returns a string with the parameters of this pattern replaced using Key-Value Coding (KVC)

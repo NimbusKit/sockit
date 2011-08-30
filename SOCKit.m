@@ -110,7 +110,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
   }
 
   NSMutableArray* tokens = [[NSMutableArray alloc] init];
-  NSMutableSet* parameters = [[NSMutableSet alloc] init];
+  NSMutableArray* parameters = [[NSMutableArray alloc] init];
 
   NSCharacterSet* nonParameterCharacterSet = [self nonParameterCharacterSet];
 
@@ -126,24 +126,27 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
     [scanner scanUpToString:@":" intoString:&token];
 
     if ([token length] > 0) {
+      // Add this static text to the token list.
       [tokens addObject:token];
     }
 
     if (![scanner isAtEnd]) {
-      // Skip the opening bracket.
+      // Skip the colon.
       [scanner setScanLocation:[scanner scanLocation] + 1];
 
-      // scanning won't modify the token if there aren't any characters to be read, so we must
-      // clear it before scanning.
+      // Scanning won't modify the token if there aren't any characters to be read, so we must
+      // clear it before scanning again.
       token = nil;
       [scanner scanUpToCharactersFromSet:nonParameterCharacterSet intoString:&token];
 
       if ([token length] > 0) {
+        // Only add parameters that have valid names.
         SOCParameter* parameter = [SOCParameter parameterWithString:token];
         [parameters addObject:parameter];
         [tokens addObject:parameter];
 
       } else {
+        // Allows for http:// to get by without creating a parameter.
         [tokens addObject:@":"];
       }
     }
@@ -347,6 +350,25 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
   }
 
   return returnValue;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (NSDictionary *)extractParameterKeyValuesFromSourceString:(NSString *)sourceString {
+  NSMutableDictionary* kvs = [[NSMutableDictionary alloc] initWithCapacity:[_parameters count]];
+
+  NSArray* values = nil;
+  NSAssert([self gatherParameterValues:&values fromString:sourceString], @"The pattern can't be used with this string.");
+
+  for (NSInteger ix = 0; ix < [values count]; ++ix) {
+    SOCParameter* parameter = [_parameters objectAtIndex:ix];
+    id value = [values objectAtIndex:ix];
+    [kvs setObject:value forKey:parameter.string];
+  }
+
+  NSDictionary* result = [[kvs copy] autorelease];
+  [kvs release]; kvs = nil;
+  return result;
 }
 
 

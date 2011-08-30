@@ -180,4 +180,16 @@ typedef void (^SimpleBlock)(void);
   STAssertEquals(testObject.llv, (long long)6, @"Values should be equal.");
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testExtractParameterKeyValuesFromSourceString {
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://:ident/:flv/:dv/:llv/:string"];
+  NSDictionary* kvs = [pattern extractParameterKeyValuesFromSourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  STAssertEquals([[kvs objectForKey:@"ident"] intValue], 3, @"Values should be equal.");
+  STAssertEquals([[kvs objectForKey:@"flv"] floatValue], 3.5f, @"Values should be equal.");
+  STAssertEquals([[kvs objectForKey:@"dv"] doubleValue], 6.14, @"Values should be equal.");
+  STAssertEquals([[kvs objectForKey:@"llv"] longLongValue], 13413143124321L, @"Values should be equal.");
+  STAssertTrue([[kvs objectForKey:@"string"] isEqualToString:@"dilly"], @"Values should be equal.");
+}
+
 @end
