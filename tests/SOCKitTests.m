@@ -128,30 +128,30 @@ typedef void (^SimpleBlock)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testOutboundParameters {
   SOCPattern* pattern = [SOCPattern patternWithString:@"soc://:ident"];
-  STAssertTrue([pattern doesStringConform:@"soc://3"], @"String should conform.");
-  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://3"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://33413413454353254235245235"], @"String should conform.");
 
-  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@""], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc://"], @"String should not conform.");
 
-  STAssertTrue([pattern doesStringConform:@"soc://joe"], @"String might conform.");
+  STAssertTrue([pattern stringMatches:@"soc://joe"], @"String might conform.");
 
   pattern = [SOCPattern patternWithString:@"soc://:ident/sandwich"];
-  STAssertTrue([pattern doesStringConform:@"soc://3/sandwich"], @"String should conform.");
-  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://3/sandwich"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://33413413454353254235245235/sandwich"], @"String should conform.");
 
-  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc:///sandwich"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@""], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc://"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc:///sandwich"], @"String should not conform.");
 
   pattern = [SOCPattern patternWithString:@"soc://:ident/sandwich/:catName"];
-  STAssertTrue([pattern doesStringConform:@"soc://3/sandwich/dilly"], @"String should conform.");
-  STAssertTrue([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/dilly"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://3/sandwich/dilly"], @"String should conform.");
+  STAssertTrue([pattern stringMatches:@"soc://33413413454353254235245235/sandwich/dilly"], @"String should conform.");
 
-  STAssertFalse([pattern doesStringConform:@""], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc://"], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc://33413413454353254235245235/sandwich/"], @"String should not conform.");
-  STAssertFalse([pattern doesStringConform:@"soc:///sandwich/"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@""], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc://"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc://33413413454353254235245235/sandwich/"], @"String should not conform.");
+  STAssertFalse([pattern stringMatches:@"soc:///sandwich/"], @"String should not conform.");
 }
 
 

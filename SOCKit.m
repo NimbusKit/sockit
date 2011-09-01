@@ -260,7 +260,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (BOOL)doesStringConform:(NSString *)string {
+- (BOOL)stringMatches:(NSString *)string {
   return [self gatherParameterValues:nil fromString:string];
 }
 

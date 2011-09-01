@@ -83,15 +83,16 @@
 + (id)patternWithString:(NSString *)string;
 
 /**
- * Returns YES if the given string can be used with performSelector:onObject:sourceString:
+ * Returns YES if the given string can be used with performSelector:onObject:sourceString: or
+ * extractParameterKeyValuesFromSourceString:.
  *
- * A conforming string must exactly match all of the static portions of the pattern and provide
+ * A matching string must exactly match all of the static portions of the pattern and provide
  * values for each of the parameters.
  *
  *      @param string  A string that may or may not conform to this pattern.
  *      @returns YES if the given string conforms to this pattern, NO otherwise.
  */
-- (BOOL)doesStringConform:(NSString *)string;
+- (BOOL)stringMatches:(NSString *)string;
 
 /**
  * Performs the given selector on the object with the matching parameter values from sourceString.
