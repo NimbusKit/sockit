@@ -16,6 +16,7 @@
 
 #import "SOCKit.h"
 
+#import <objc/runtime.h>
 #import <assert.h>
 
 typedef enum {
