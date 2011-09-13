@@ -133,7 +133,11 @@
  *
  * Collection Operators:
  * http://developer.apple.com/library/ios/#documentation/cocoa/conceptual/KeyValueCoding/Articles/CollectionOperators.html#//apple_ref/doc/uid/20002176-BAJEAIEE
- *  @see stringFromObject:withBlock:
+ *
+ *      @param object  The object whose properties will be used to replace the parameters in
+ *                     the pattern.
+ *      @returns A string with the pattern parameters replaced by the object property values.
+ *      @see stringFromObject:withBlock:
  */
 - (NSString *)stringFromObject:(id)object;
 
@@ -145,19 +149,25 @@
  * For example, consider we have individual object values that need percent escapes added to them,
  * while preserving the the slashes, question marks, and ampersands of a typical resource path. 
  * Using blocks, this is very succinct:
- * 
- * NSDictionary *person = [NSDictionary dictionaryWithObjectsAndKeys:@"SECRET|KEY",@"password", 
- *     @"Joe Bob Briggs", @"name", nil];
- * SOCPattern *soc = [SOCPattern patternWithString:@"/people/:name/:password"];
- * NSString *actualPath = [soc stringFromObject:person withBlock:^(NSString *)interpolatedString) {
- *     return [interpolatedString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
- * }
- * NSString *expectedPath = @"/people/Joe%20Bob%20Briggs/SECRET%7CKEY";
  *
- *      @param object  The object whose properties you want to interpolate
- *      @param block   An optional block (may be nil) that modifies or encodes the interpolated 
- *                     property value string.  If block is not nil, it must at least the incoming string.
- *      @returns A string with the interpolated values from the object, using the pre-configured pattern.
+ * @code
+ * NSDictionary* person = [NSDictionary dictionaryWithObjectsAndKeys:
+ *                         @"SECRET|KEY",@"password", 
+ *                         @"Joe Bob Briggs", @"name", nil];
+ * SOCPattern* soc = [SOCPattern patternWithString:@"/people/:name/:password"];
+ * NSString* actualPath = [soc stringFromObject:person withBlock:^(NSString *)propertyValue) {
+ *   return [propertyValue stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+ * }
+ * NSString* expectedPath = @"/people/Joe%20Bob%20Briggs/SECRET%7CKEY";
+ * @endcode
+ *
+ *      @param object  The object whose properties will be used to replace the parameters in
+ *                     the pattern.
+ *      @param block   An optional block (may be nil) that modifies or encodes each
+ *                     property value string. The block accepts one parameter - the property
+ *                     value as a string - and should return the modified property string.
+ *      @returns A string with the pattern parameters replaced by the block-processed object
+ *               property values.
  *      @see stringFromObject:
  */
 - (NSString *)stringFromObject:(id)object withBlock:(NSString*(^)(NSString*))block;

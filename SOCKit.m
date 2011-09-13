@@ -374,24 +374,25 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSString *)accumulatedStringWithParameterValues:(NSDictionary *)parameterValues {
-    NSMutableString* accumulator = [[NSMutableString alloc] initWithCapacity:[_patternString length]];
-    
-    for (id token in _tokens) {
-        if ([token isKindOfClass:[NSString class]]) {
-            [accumulator appendString:token];
-            
-        } else {
-            SOCParameter* parameter = token;
-            [accumulator appendString:[parameterValues objectForKey:parameter.string]];
-        }
+- (NSString *)_stringWithParameterValues:(NSDictionary *)parameterValues {
+  NSMutableString* accumulator = [[NSMutableString alloc] initWithCapacity:[_patternString length]];
+
+  for (id token in _tokens) {
+    if ([token isKindOfClass:[NSString class]]) {
+      [accumulator appendString:token];
+
+    } else {
+      SOCParameter* parameter = token;
+      [accumulator appendString:[parameterValues objectForKey:parameter.string]];
     }
-    
-    NSString* result = nil;
-    result = [[accumulator copy] autorelease];
-    [accumulator release]; accumulator = nil;
-    return result;
+  }
+
+  NSString* result = nil;
+  result = [[accumulator copy] autorelease];
+  [accumulator release]; accumulator = nil;
+  return result;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString *)stringFromObject:(id)object {
@@ -404,8 +405,9 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
     NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
     [parameterValues setObject:stringValue forKey:parameter.string];
   }
-  return [self accumulatedStringWithParameterValues:parameterValues];
+  return [self _stringWithParameterValues:parameterValues];
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #if NS_BLOCKS_AVAILABLE
@@ -416,11 +418,14 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
   NSMutableDictionary* parameterValues = [NSMutableDictionary dictionaryWithCapacity:[_parameters count]];
   for (SOCParameter* parameter in _parameters) {
     NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
-    if (block)
+    if (nil != block) {
       stringValue = block(stringValue);
-    [parameterValues setObject:stringValue forKey:parameter.string];
+    }
+    if (nil != stringValue) {
+      [parameterValues setObject:stringValue forKey:parameter.string];
+    }
   }
-  return [self accumulatedStringWithParameterValues:parameterValues];
+  return [self _stringWithParameterValues:parameterValues];
 }
 #endif
 
