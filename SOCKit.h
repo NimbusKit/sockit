@@ -133,8 +133,45 @@
  *
  * Collection Operators:
  * http://developer.apple.com/library/ios/#documentation/cocoa/conceptual/KeyValueCoding/Articles/CollectionOperators.html#//apple_ref/doc/uid/20002176-BAJEAIEE
+ *
+ *      @param object  The object whose properties will be used to replace the parameters in
+ *                     the pattern.
+ *      @returns A string with the pattern parameters replaced by the object property values.
+ *      @see stringFromObject:withBlock:
  */
 - (NSString *)stringFromObject:(id)object;
+
+#if NS_BLOCKS_AVAILABLE
+/**
+ * Returns a string with the parameters of this pattern replaced using Key-Value Coding (KVC)
+ * on the receiving object, and the result is (optionally) modified or encoded by the block. 
+ * 
+ * For example, consider we have individual object values that need percent escapes added to them,
+ * while preserving the the slashes, question marks, and ampersands of a typical resource path. 
+ * Using blocks, this is very succinct:
+ *
+ * @code
+ * NSDictionary* person = [NSDictionary dictionaryWithObjectsAndKeys:
+ *                         @"SECRET|KEY",@"password", 
+ *                         @"Joe Bob Briggs", @"name", nil];
+ * SOCPattern* soc = [SOCPattern patternWithString:@"/people/:name/:password"];
+ * NSString* actualPath = [soc stringFromObject:person withBlock:^(NSString *)propertyValue) {
+ *   return [propertyValue stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+ * }
+ * NSString* expectedPath = @"/people/Joe%20Bob%20Briggs/SECRET%7CKEY";
+ * @endcode
+ *
+ *      @param object  The object whose properties will be used to replace the parameters in
+ *                     the pattern.
+ *      @param block   An optional block (may be nil) that modifies or encodes each
+ *                     property value string. The block accepts one parameter - the property
+ *                     value as a string - and should return the modified property string.
+ *      @returns A string with the pattern parameters replaced by the block-processed object
+ *               property values.
+ *      @see stringFromObject:
+ */
+- (NSString *)stringFromObject:(id)object withBlock:(NSString*(^)(NSString*))block;
+#endif
 
 @end
 

@@ -374,18 +374,7 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSString *)stringFromObject:(id)object {
-  if ([_tokens count] == 0) {
-    return @"";
-  }
-
-  NSMutableDictionary* parameterValues =
-  [NSMutableDictionary dictionaryWithCapacity:[_parameters count]];
-  for (SOCParameter* parameter in _parameters) {
-    NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
-    [parameterValues setObject:stringValue forKey:parameter.string];
-  }
-
+- (NSString *)_stringWithParameterValues:(NSDictionary *)parameterValues {
   NSMutableString* accumulator = [[NSMutableString alloc] initWithCapacity:[_patternString length]];
 
   for (id token in _tokens) {
@@ -404,8 +393,43 @@ SOCArgumentType SOCArgumentTypeForTypeAsChar(char argType);
   return result;
 }
 
-@end
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (NSString *)stringFromObject:(id)object {
+  if ([_tokens count] == 0) {
+    return @"";
+  }
+  NSMutableDictionary* parameterValues =
+  [NSMutableDictionary dictionaryWithCapacity:[_parameters count]];
+  for (SOCParameter* parameter in _parameters) {
+    NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
+    [parameterValues setObject:stringValue forKey:parameter.string];
+  }
+  return [self _stringWithParameterValues:parameterValues];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#if NS_BLOCKS_AVAILABLE
+- (NSString *)stringFromObject:(id)object withBlock:(NSString *(^)(NSString*))block {
+  if ([_tokens count] == 0) {
+    return @"";
+  }
+  NSMutableDictionary* parameterValues = [NSMutableDictionary dictionaryWithCapacity:[_parameters count]];
+  for (SOCParameter* parameter in _parameters) {
+    NSString* stringValue = [NSString stringWithFormat:@"%@", [object valueForKeyPath:parameter.string]];
+    if (nil != block) {
+      stringValue = block(stringValue);
+    }
+    if (nil != stringValue) {
+      [parameterValues setObject:stringValue forKey:parameter.string];
+    }
+  }
+  return [self _stringWithParameterValues:parameterValues];
+}
+#endif
+
+@end
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation SOCParameter
