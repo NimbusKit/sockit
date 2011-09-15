@@ -28,17 +28,17 @@
  * Patterns, once created, can be used to efficiently turn objects into strings and
  * vice versa. Respectively, these techniques are referred to as inbound and outbound.
  *
- * Inbound example (turn an object into a string):
+ * Inbound example (creating a string from an object):
  *
  *   pattern: api.github.com/users/:username/gists
- *   > [pattern stringFromObject:githubUser];
+ *   > [pattern stringFromObject:[GithubUser userWithUsername:@"jverkoey"]];
  *   returns: api.github.com/users/jverkoey/gists
  *
  *   pattern: api.github.com/repos/:username/:repo/issues
- *   > [pattern stringFromObject:githubRepo];
+ *   > [pattern stringFromObject:[GithubRepo repoWithUsername:@"jverkoey" repo:@"sockit"]];
  *   returns: api.github.com/repos/jverkoey/sockit/issues
  *
- * Outbound example (turn a string into an object):
+ * Outbound example (performing a selector on an object with values from a given string):
  *
  *   pattern: github.com/:username
  *   > [pattern performSelector:@selector(initWithUsername:) onObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
@@ -55,7 +55,7 @@
  *   returns: nil because setUsername: does not have a return value. githubUser's username property
  *            is now @"jverkoey".
  *
- * Note: Parameters must be separated by string literals
+ * Note 1: Parameters must be separated by string literals
  *
  *      Pattern parameters must be separated by some sort of non-parameter character.
  *      This means that you can't define a pattern like :user:repo. This is because when we
@@ -75,9 +75,9 @@
  *      a KVC character then you can escape the character using a double backslash. For example,
  *      @"/:userid.json" would create a pattern that uses KVC to access the json property of the
  *      username value. In this case we wish to interpret the ".json" portion as a static string.
- *      In order to do so we can escape the "." using a double backslash, "\\". For example:
- *      @"/:userid\\.json". This will allow strings of the form @"/3.json" to be matched by the
- *      pattern. This also works with outbound parameters, so that the string @"/3.json" can
+ *      In order to do so we escape the "." using a double backslash: "\\.". For example:
+ *      @"/:userid\\.json". This makes it possible to create strings of the form @"/3.json".
+ *      This also works with outbound parameters, so that the string @"/3.json" can
  *      be used with the pattern to invoke a selector with "3" as the first argument rather
  *      than "3.json".
  *
@@ -86,6 +86,12 @@
  *      "@" => @"\\@"
  *      "." => @"\\."
  *      "\\" => @"\\\\"
+ *
+ * Note 4: Allocating new objects with outbound patterns
+ *
+ *      SOCKit will allocate a new object of a given class if
+ *      performSelector:onObject:sourceString: is provided a selector with "init" as a prefix
+ *      and object is a Class. E.g. [GithubUser class].
  */
 @interface SOCPattern : NSObject {
 @private
@@ -96,6 +102,8 @@
 
 /**
  * Initializes a newly allocated pattern object with the given pattern string.
+ *
+ * Designated initializer.
  */
 - (id)initWithString:(NSString *)string;
 + (id)patternWithString:(NSString *)string;
