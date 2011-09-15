@@ -117,6 +117,36 @@ NSString *sockitBetterURLEncodeString(NSString *unencodedString);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)testCharacterEscapes {
+  NSDictionary* obj = [NSDictionary dictionaryWithObjectsAndKeys:
+                       [NSNumber numberWithInt:1337], @"leet",
+                       [NSNumber numberWithInt:5000], @"five",
+                       nil];
+
+  STAssertTrue([SOCStringFromStringWithObject(@".", obj) isEqualToString:@"."], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"\\.", obj) isEqualToString:@"."], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":", obj) isEqualToString:@":"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"\\:", obj) isEqualToString:@":"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"@", obj) isEqualToString:@"@"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"\\@", obj) isEqualToString:@"@"], @"Should be the same string.");
+
+  STAssertTrue([SOCStringFromStringWithObject(@":leet\\.value", obj) isEqualToString:@"1337.value"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet\\:value", obj) isEqualToString:@"1337:value"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet\\@value", obj) isEqualToString:@"1337@value"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet\\:\\:value", obj) isEqualToString:@"1337::value"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@":leet\\:\\:\\.\\@value", obj) isEqualToString:@"1337::.@value"], @"Should be the same string.");
+  STAssertTrue([SOCStringFromStringWithObject(@"\\\\:leet", obj) isEqualToString:@"\\1337"], @"Should be the same string.");
+
+  SOCPattern* pattern = [SOCPattern patternWithString:@"soc://\\:ident"];
+  STAssertTrue([pattern stringMatches:@"soc://:ident"], @"String should conform.");
+  pattern = [SOCPattern patternWithString:@"soc://\\\\:ident"];
+  STAssertTrue([pattern stringMatches:@"soc://\\3"], @"String should conform.");
+  pattern = [SOCPattern patternWithString:@"soc://:ident\\.json"];
+  STAssertTrue([pattern stringMatches:@"soc://3.json"], @"String should conform.");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testCollectionOperators {
   NSDictionary* obj = [NSDictionary dictionaryWithObjectsAndKeys:
                        [NSNumber numberWithInt:1337], @"leet",

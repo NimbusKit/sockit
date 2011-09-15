@@ -55,19 +55,37 @@
  *   returns: nil because setUsername: does not have a return value. githubUser's username property
  *            is now @"jverkoey".
  *
- * Note:
+ * Note: Parameters must be separated by string literals
  *
  *      Pattern parameters must be separated by some sort of non-parameter character.
  *      This means that you can't define a pattern like :user:repo. This is because when we
  *      get around to wanting to decode the string back into an object we need some sort of
  *      delimiter between the parameters.
  *
- * Note 2:
+ * Note 2: When colons aren't parameters
  *
  *      If you have colons in your text that aren't followed by a valid parameter name then the
  *      colon will be treated as static text. This is handy if you're defining a URL pattern.
  *      For example: @"http://github.com/:user" only has one parameter, :user. The ":" in http://
  *      is ignored.
+ *
+ * Note 3: Escaping KVC characters
+ *
+ *      If you need to use a KVC character in a SOCKit pattern as a literal string token and not
+ *      a KVC character then you can escape the character using a double backslash. For example,
+ *      @"/:userid.json" would create a pattern that uses KVC to access the json property of the
+ *      username value. In this case we wish to interpret the ".json" portion as a static string.
+ *      In order to do so we can escape the "." using a double backslash, "\\". For example:
+ *      @"/:userid\\.json". This will allow strings of the form @"/3.json" to be matched by the
+ *      pattern. This also works with outbound parameters, so that the string @"/3.json" can
+ *      be used with the pattern to invoke a selector with "3" as the first argument rather
+ *      than "3.json".
+ *
+ *      You can escape the following characters:
+ *      ":" => @"\\:"
+ *      "@" => @"\\@"
+ *      "." => @"\\."
+ *      "\\" => @"\\\\"
  */
 @interface SOCPattern : NSObject {
 @private
