@@ -143,7 +143,7 @@
  *                           this string are extracted into the NSDictionary.
  *      @returns A dictionary of key value pairs. All values will be NSStrings. The keys will
  *               correspond to the pattern's parameter names. Duplicate key values will be
- *               written over by later values.
+ *               overwritten by later values.
  */
 - (NSDictionary *)parameterDictionaryFromSourceString:(NSString *)sourceString;
 
@@ -173,7 +173,7 @@
  * on the receiving object, and the result is (optionally) modified or encoded by the block. 
  * 
  * For example, consider we have individual object values that need percent escapes added to them,
- * while preserving the the slashes, question marks, and ampersands of a typical resource path. 
+ * while preserving the slashes, question marks, and ampersands of a typical resource path. 
  * Using blocks, this is very succinct:
  *
  * @code
