@@ -239,7 +239,7 @@ NSString *sockitBetterURLEncodeString(NSString *unencodedString);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)testExtractParameterKeyValuesFromSourceString {
   SOCPattern* pattern = [SOCPattern patternWithString:@"soc://:ident/:flv/:dv/:llv/:string"];
-  NSDictionary* kvs = [pattern extractParameterKeyValuesFromSourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
+  NSDictionary* kvs = [pattern parameterDictionaryFromSourceString:@"soc://3/3.5/6.14/13413143124321/dilly"];
   STAssertEquals([[kvs objectForKey:@"ident"] intValue], 3, @"Values should be equal.");
   STAssertEquals([[kvs objectForKey:@"flv"] floatValue], 3.5f, @"Values should be equal.");
   STAssertEquals([[kvs objectForKey:@"dv"] doubleValue], 6.14, @"Values should be equal.");

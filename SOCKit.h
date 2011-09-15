@@ -145,7 +145,7 @@
  *               correspond to the pattern's parameter names. Duplicate key values will be
  *               written over by later values.
  */
-- (NSDictionary *)extractParameterKeyValuesFromSourceString:(NSString *)sourceString;
+- (NSDictionary *)parameterDictionaryFromSourceString:(NSString *)sourceString;
 
 /**
  * Returns a string with the parameters of this pattern replaced using Key-Value Coding (KVC)

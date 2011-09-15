@@ -397,7 +397,7 @@ NSString* kTemporaryBackslashToken = @"/backslash/";
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDictionary *)extractParameterKeyValuesFromSourceString:(NSString *)sourceString {
+- (NSDictionary *)parameterDictionaryFromSourceString:(NSString *)sourceString {
   NSMutableDictionary* kvs = [[NSMutableDictionary alloc] initWithCapacity:[_parameters count]];
 
   NSArray* values = nil;
