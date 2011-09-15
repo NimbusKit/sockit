@@ -28,7 +28,7 @@
  * Patterns, once created, can be used to efficiently turn objects into strings and
  * vice versa. Respectively, these techniques are referred to as inbound and outbound.
  *
- * Inbound example (creating a string from an object):
+ * Inbound examples (creating strings from objects):
  *
  *   pattern: api.github.com/users/:username/gists
  *   > [pattern stringFromObject:[GithubUser userWithUsername:@"jverkoey"]];
@@ -38,7 +38,7 @@
  *   > [pattern stringFromObject:[GithubRepo repoWithUsername:@"jverkoey" repo:@"sockit"]];
  *   returns: api.github.com/repos/jverkoey/sockit/issues
  *
- * Outbound example (performing a selector on an object with values from a given string):
+ * Outbound examples (performing selectors on objects with values from given strings):
  *
  *   pattern: github.com/:username
  *   > [pattern performSelector:@selector(initWithUsername:) onObject:[GithubUser class] sourceString:@"github.com/jverkoey"];
@@ -62,20 +62,22 @@
  *      get around to wanting to decode the string back into an object we need some sort of
  *      delimiter between the parameters.
  *
- * Note 2: When colons aren't parameters
+ * Note 2: When colons aren't seen as parameters
  *
  *      If you have colons in your text that aren't followed by a valid parameter name then the
  *      colon will be treated as static text. This is handy if you're defining a URL pattern.
  *      For example: @"http://github.com/:user" only has one parameter, :user. The ":" in http://
- *      is ignored.
+ *      is treated as a string literal and not a parameter.
  *
  * Note 3: Escaping KVC characters
  *
- *      If you need to use a KVC character in a SOCKit pattern as a literal string token and not
- *      a KVC character then you can escape the character using a double backslash. For example,
+ *      If you need to use KVC characters in SOCKit patterns as literal string tokens and not
+ *      treated with KVC then you must escape the characters using double backslashes. For example,
  *      @"/:userid.json" would create a pattern that uses KVC to access the json property of the
- *      username value. In this case we wish to interpret the ".json" portion as a static string.
- *      In order to do so we escape the "." using a double backslash: "\\.". For example:
+ *      username value. In this case, however, we wish to interpret the ".json" portion as a
+ *      static string.
+ *
+ *      In order to do so we must escape the "." using a double backslash: "\\.". For example:
  *      @"/:userid\\.json". This makes it possible to create strings of the form @"/3.json".
  *      This also works with outbound parameters, so that the string @"/3.json" can
  *      be used with the pattern to invoke a selector with "3" as the first argument rather
