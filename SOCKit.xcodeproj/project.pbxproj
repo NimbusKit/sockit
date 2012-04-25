@@ -6,6 +6,21 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		66C951F915487A0400D4191E /* Generate Framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 66C951FA15487A0400D4191E /* Build configuration list for PBXAggregateTarget "Generate Framework" */;
+			buildPhases = (
+				66C951FF15487A1C00D4191E /* Generate Framework */,
+			);
+			dependencies = (
+				66C951FE15487A0D00D4191E /* PBXTargetDependency */,
+			);
+			name = "Generate Framework";
+			productName = "Generate Framework";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		660B689114088B4A00EAAFDC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B689014088B4A00EAAFDC /* Foundation.framework */; };
 		660B689F14088B4A00EAAFDC /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B689E14088B4A00EAAFDC /* SenTestingKit.framework */; };
@@ -13,7 +28,7 @@
 		660B68A214088B4A00EAAFDC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B689014088B4A00EAAFDC /* Foundation.framework */; };
 		660B68A414088B4A00EAAFDC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B68A314088B4A00EAAFDC /* CoreGraphics.framework */; };
 		660B68A714088B4A00EAAFDC /* libSOCKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 660B688D14088B4A00EAAFDC /* libSOCKit.a */; };
-		667E34D0140BD732002FD733 /* SOCKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 667E34CE140BD732002FD733 /* SOCKit.h */; };
+		667E34D0140BD732002FD733 /* SOCKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 667E34CE140BD732002FD733 /* SOCKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		667E34D1140BD732002FD733 /* SOCKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 667E34CF140BD732002FD733 /* SOCKit.m */; };
 		667E34DB140BD776002FD733 /* SOCKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 667E34DA140BD776002FD733 /* SOCKitTests.m */; };
 		66FAD61E140BF5E40015B014 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 667E34D7140BD75B002FD733 /* InfoPlist.strings */; };
@@ -21,6 +36,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		660B68A514088B4A00EAAFDC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 660B688414088B4900EAAFDC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 660B688C14088B4A00EAAFDC;
+			remoteInfo = SOCKit;
+		};
+		66C951FD15487A0D00D4191E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 660B688414088B4900EAAFDC /* Project object */;
 			proxyType = 1;
@@ -137,6 +159,7 @@
 				660B688914088B4A00EAAFDC /* Sources */,
 				660B688A14088B4A00EAAFDC /* Frameworks */,
 				660B688B14088B4A00EAAFDC /* Headers */,
+				66C951F8154879CE00D4191E /* Prepare Framework */,
 			);
 			buildRules = (
 			);
@@ -189,6 +212,7 @@
 			targets = (
 				660B688C14088B4A00EAAFDC /* SOCKit */,
 				660B689C14088B4A00EAAFDC /* SOCKitTests */,
+				66C951F915487A0400D4191E /* Generate Framework */,
 			);
 		};
 /* End PBXProject section */
@@ -218,6 +242,34 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
+		66C951F8154879CE00D4191E /* Prepare Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A\"\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"\n\n# Link the \"Current\" version to \"A\"\nln -sfh A \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/Current\"\nln -sfh Versions/Current/Headers \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Headers\"\nln -sfh \"Versions/Current/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/${PRODUCT_NAME}\"\n\n# The -a ensures that the headers maintain the source modification date so that we don't constantly\n# cause propagating rebuilds of files that import these headers.\ncp -a \"${TARGET_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"";
+		};
+		66C951FF15487A1C00D4191E /* Generate Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset +u\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\nexit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_TARGET_NAME=${PROJECT_NAME}\nSF_EXECUTABLE_PATH=\"lib${SF_TARGET_NAME}.a\"\nSF_WRAPPER_NAME=\"${SF_TARGET_NAME}.framework\"\n\n# The following conditionals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\nSF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\necho \"Could not find platform name from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\nSF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\necho \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\nSF_OTHER_PLATFORM=iphonesimulator\nSF_ARCHS=i386\nelse\nSF_OTHER_PLATFORM=iphoneos\n# Force armv6 to be built because Xcode 4 likes to only build armv7\nSF_ARCHS=\"armv6 armv7\"\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\nSF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\necho \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\nexit 1\nfi\n\n# Build the other platform.\nxcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${SF_OTHER_PLATFORM}\" ARCHS=\"${SF_ARCHS}\" $ACTION\n\n# Smash the two static libraries into one fat binary and store it in the .framework\nlipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -244,6 +296,11 @@
 			isa = PBXTargetDependency;
 			target = 660B688C14088B4A00EAAFDC /* SOCKit */;
 			targetProxy = 660B68A514088B4A00EAAFDC /* PBXContainerItemProxy */;
+		};
+		66C951FE15487A0D00D4191E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 660B688C14088B4A00EAAFDC /* SOCKit */;
+			targetProxy = 66C951FD15487A0D00D4191E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -304,20 +361,28 @@
 		660B68B414088B4A00EAAFDC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /tmp/SOCKit.dst;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SKIP_INSTALL = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Debug;
 		};
 		660B68B514088B4A00EAAFDC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /tmp/SOCKit.dst;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SKIP_INSTALL = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
@@ -344,6 +409,20 @@
 				INFOPLIST_FILE = "tests/SOCKitTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+		66C951FB15487A0400D4191E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		66C951FC15487A0400D4191E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -376,6 +455,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		66C951FA15487A0400D4191E /* Build configuration list for PBXAggregateTarget "Generate Framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66C951FB15487A0400D4191E /* Debug */,
+				66C951FC15487A0400D4191E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
