@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sockit by jverkoey</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Sockit</h1>
+        <p class="header">String &lt;-&gt; Object Coder for Objective-C</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/jverkoey/sockit/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/jverkoey/sockit/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/jverkoey/sockit">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/jverkoey">jverkoey</a></p>
+
+
+      </header>
+      <section>
+        <h1>SOCKit</h1>
+
+<p>String &lt;-&gt; Object Coding for Objective-C. Rhymes with "socket".</p>
+
+<p>With SOCKit and <a href="https://github.com/jverkoey/sockit/blob/master/SOCKit.h">SOCPattern</a> you can easily transform objects into strings and vice versa.</p>
+
+<h3>Two examples, cuz devs love examples.</h3>
+
+<div class="highlight">
+<pre><span class="n">SOCPattern</span><span class="o">*</span> <span class="n">pattern</span> <span class="o">=</span> <span class="p">[</span><span class="n">SOCPattern</span> <span class="nl">patternWithString:</span><span class="s">@"api.github.com/users/:username/gists"</span><span class="p">];</span>
+<span class="p">[</span><span class="n">pattern</span> <span class="nl">stringFromObject:</span><span class="n">githubUser</span><span class="p">];</span>
+<span class="o">&gt;</span> <span class="s">@"api.github.com/users/jverkoey/gists"</span>
+</pre>
+</div>
+
+
+<div class="highlight">
+<pre><span class="n">SOCPattern</span><span class="o">*</span> <span class="n">pattern</span> <span class="o">=</span> <span class="p">[</span><span class="n">SOCPattern</span> <span class="nl">patternWithString:</span><span class="s">@"github.com/:username"</span><span class="p">];</span>
+<span class="p">[</span><span class="n">pattern</span> <span class="nl">performSelector:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">initWithUsername:</span><span class="p">)</span> <span class="nl">onObject:</span><span class="p">[</span><span class="n">GithubUser</span> <span class="n">class</span><span class="p">]</span> <span class="nl">sourceString:</span><span class="s">@"github.com/jverkoey"</span><span class="p">];</span>
+<span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">GithubUser</span><span class="o">&gt;</span> <span class="n">username</span> <span class="o">=</span> <span class="n">jverkoey</span>
+</pre>
+</div>
+
+
+<h3>Hey, this is really similar to defining routes in Rails.</h3>
+
+<p>Damn straight it is.</p>
+
+<h3>And isn't this kind of like Three20's navigator?</h3>
+
+<p>Except hella better. It's also entirely incompatible with Three20 routes. This kinda blows if
+you've already invested a ton of energy into Three20's routing tech, but here are a few reasons
+why SOCKit is better:</p>
+
+<ol>
+<li>
+<em>Selectors are not defined in the pattern</em>. The fact that Three20 requires that you define
+selectors in the pattern is scary as hell: rename a method in one of your controllers and
+your URL routing will silently break. No warnings, just broke. With SOCKit you define the
+selectors using <a href="https://github.com/selector" class="user-mention">@selector</a> notation and SOCKit infers the parameters from the pattern definition.
+This way you can depend on the compiler to fire a warning if the selector isn't defined anywhere.</li>
+<li>
+<em>Parameters are encoded using true KVC</em>. You now have full access to <a href="http://developer.apple.com/library/ios/#documentation/cocoa/conceptual/KeyValueCoding/Articles/CollectionOperators.html#//apple_ref/doc/uid/20002176-BAJEAIEE">KVC collection operators</a>.</li>
+<li>
+<em>SOCKit is fully unit tested and documented</em>. Not much more to be said here.</li>
+</ol><p>Here's a quick breakdown of the differences between Three20 and SOCKit, if SOCKit were used as
+the backend for Three20's URL routing.</p>
+
+<pre><code>Three20: [map from:@"twitter://tweet/(initWithTweetId:)" toViewController:[TweetController class]];
+SOCKit:  [map from:@"twitter://tweet/:id" toViewController:[TweetController class] selector:@selector(initWithTweetId:)];
+
+Three20: [map from:[Tweet class] name:@"thread" toURL:@"twitter://tweet/(id)/thread"];
+SOCKit:  [map from:[Tweet class] name:@"thread" toURL:@"twitter://tweet/:id/thread"];
+</code></pre>
+
+<h2>Where it's being used</h2>
+
+<p>SOCKit is a sibling project to <a href="http://jverkoey.github.com/nimbus">Nimbus</a>, a light-weight and modular framework that makes it
+easy to blaze a trail with your iOS apps. Nimbus will soon be using SOCKit in a re-envisioning
+of Three20's navigator.</p>
+
+<p>Users of RESTKit will notice that SOCKit provides similar functionality to RESTKit's
+<a href="https://github.com/RestKit/RestKit/blob/master/Code/Network/RKClient.m#L37">RKMakePathWithObject</a>. In fact, both <code>RKMakePathWithObject</code> and the underlying <code>RKPathMatcher</code>
+class rely on SOCKit behind the scenes.</p>
+
+<h2>Adding SOCKit to your project</h2>
+
+<p>This lightweight library is built to be a dead-simple airdrop directly into your project. Contained
+in SOCKit.h and SOCKit.m is all of the functionality you will need in order to start mapping
+Strings &lt;-&gt; Objects. To start using SOCKit, simply download or <code>git checkout</code> the SOCKit repo
+and drag SOCKit.h and SOCKit.m to your project's source tree. <code>#import "SOCKit.h"</code> where you want
+to use SOCKit and start pumping out some mad String &lt;-&gt; Object coding.</p>
+
+<h2>Some cool things</h2>
+
+<p>When coding objects into strings you define parameters by prefixing the property name with a colon.
+So if you have a Tweet object with a <code>tweetId</code> property, the pattern parameter name would look like
+<code>:tweetId</code>. Simple enough.</p>
+
+<p>But now let's say you have a Tweet object that contains a reference to a TwitterUser object via
+the <code>user</code> property, and that TwitterUser object has a <code>username</code> property. Check this out:
+<code>:user.username</code>. If this was one of my tweets and I encoded the Tweet object using a SOCKit
+pattern the resulting string would be <code>@"featherless"</code>. KVC rocks.</p>
+
+<h2>Learning more</h2>
+
+<p>In-depth documentation can be found in the <a href="https://github.com/jverkoey/sockit/blob/master/SOCKit.h">SOCKit.h</a> header file.</p>
+
+<h2>Contributing</h2>
+
+<p>If you find a bug in SOCKit please file an issue on the Github <a href="https://github.com/jverkoey/sockit/issues">SOCKit issue tracker</a>. Even
+better: if you have a solution for the bug then fork the project and make a pull request.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+		
+  </body>
+</html>
