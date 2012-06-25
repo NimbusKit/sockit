@@ -51,8 +51,7 @@ SOCKit:  [map from:[Tweet class] name:@"thread" toURL:@"twitter://tweet/:id/thre
 ## Where it's being used
 
 SOCKit is a sibling project to [Nimbus][], a light-weight and modular framework that makes it
-easy to blaze a trail with your iOS apps. Nimbus will soon be using SOCKit in a re-envisioning
-of Three20's navigator.
+easy to blaze a trail with your iOS apps.
 
 Users of RESTKit will notice that SOCKit provides similar functionality to RESTKit's
 [RKMakePathWithObject][]. In fact, both `RKMakePathWithObject` and the underlying `RKPathMatcher`
