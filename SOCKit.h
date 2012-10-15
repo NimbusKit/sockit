@@ -95,7 +95,7 @@
  *      performSelector:onObject:sourceString: is provided a selector with "init" as a prefix
  *      and object is a Class. E.g. [GithubUser class].
  */
-@interface SOCPattern : NSObject {
+@interface SOCPattern : NSObject <NSCopying> {
 @private
   NSString* _patternString;
   NSArray* _tokens;
