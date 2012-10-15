@@ -54,6 +54,10 @@ NSString* kTemporaryBackslashToken = @"/backslash/";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface SOCPattern()
 
+@property (nonatomic, retain) NSString *patternString;
+@property (nonatomic, retain) NSArray *tokens;
+@property (nonatomic, retain) NSArray *parameters;
+
 - (void)_compilePattern;
 
 @end
@@ -63,6 +67,22 @@ NSString* kTemporaryBackslashToken = @"/backslash/";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation SOCPattern
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (id)copyWithZone:(NSZone *)zone
+{
+    id copy = [[[self class] alloc] init];
+    
+    if (copy)
+    {
+        [copy setPatternString:[[self.patternString copy] autorelease]];
+        [copy setTokens:[[self.tokens copy] autorelease]];
+        [copy setParameters:[[self.parameters copy] autorelease]];
+    }
+    
+    return copy;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
