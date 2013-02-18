@@ -74,7 +74,7 @@
  *      If you need to use KVC characters in SOCKit patterns as literal string tokens and not
  *      treated with KVC then you must escape the characters using double backslashes. For example,
  *      @"/:userid.json" would create a pattern that uses KVC to access the json property of the
- *      username value. In this case, however, we wish to interpret the ".json" portion as a
+ *      userid value. In this case, however, we wish to interpret the ".json" portion as a
  *      static string.
  *
  *      In order to do so we must escape the "." using a double backslash: "\\.". For example:
