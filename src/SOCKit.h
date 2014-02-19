@@ -1,5 +1,5 @@
 //
-// Copyright 2011-2012 Jeff Verkoeyen
+// Copyright 2011-2014 NimbusKit
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -94,6 +94,8 @@
  *      SOCKit will allocate a new object of a given class if
  *      performSelector:onObject:sourceString: is provided a selector with "init" as a prefix
  *      and object is a Class. E.g. [GithubUser class].
+ *
+ * @ingroup NimbusSockit
  */
 @interface SOCPattern : NSObject <NSCopying> {
 @private
