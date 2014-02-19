@@ -405,7 +405,6 @@ NSString* kTemporaryBackslashToken = @"/backslash/";
   return [self _stringWithParameterValues:parameterValues];
 }
 
-#if NS_BLOCKS_AVAILABLE
 - (NSString *)stringFromObject:(id)object withBlock:(NSString *(^)(NSString*))block {
   if ([_tokens count] == 0) {
     return @"";
@@ -422,7 +421,6 @@ NSString* kTemporaryBackslashToken = @"/backslash/";
   }
   return [self _stringWithParameterValues:parameterValues];
 }
-#endif
 
 @end
 
