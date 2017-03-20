@@ -1,0 +1,407 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FE0935DD1E8031930092BF67 /* NimbusSockit.h in Headers */ = {isa = PBXBuildFile; fileRef = FE0935D81E8031930092BF67 /* NimbusSockit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FE0935DE1E8031930092BF67 /* SOCKit.h in Headers */ = {isa = PBXBuildFile; fileRef = FE0935D91E8031930092BF67 /* SOCKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FE0935DF1E8031930092BF67 /* SOCKit.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0935DA1E8031930092BF67 /* SOCKit.m */; };
+		FE0935EA1E8031F10092BF67 /* SOCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0935CC1E8030B60092BF67 /* SOCKit.framework */; };
+		FE0935F11E80325C0092BF67 /* SOCKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FE0935DC1E8031930092BF67 /* SOCKitTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FE0935EB1E8031F10092BF67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE0935C31E8030B60092BF67 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE0935CB1E8030B60092BF67;
+			remoteInfo = "SOCKit iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FE0935CC1E8030B60092BF67 /* SOCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SOCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE0935D81E8031930092BF67 /* NimbusSockit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NimbusSockit.h; sourceTree = "<group>"; };
+		FE0935D91E8031930092BF67 /* SOCKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SOCKit.h; sourceTree = "<group>"; };
+		FE0935DA1E8031930092BF67 /* SOCKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SOCKit.m; sourceTree = "<group>"; };
+		FE0935DC1E8031930092BF67 /* SOCKitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SOCKitTests.m; sourceTree = "<group>"; };
+		FE0935E51E8031F10092BF67 /* SOCKit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SOCKit.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FE0935C81E8030B60092BF67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE0935E21E8031F10092BF67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE0935EA1E8031F10092BF67 /* SOCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FE0935C21E8030B60092BF67 = {
+			isa = PBXGroup;
+			children = (
+				FE0935D71E8031930092BF67 /* src */,
+				FE0935DB1E8031930092BF67 /* tests */,
+				FE0935CD1E8030B60092BF67 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FE0935CD1E8030B60092BF67 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FE0935CC1E8030B60092BF67 /* SOCKit.framework */,
+				FE0935E51E8031F10092BF67 /* SOCKit.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FE0935D71E8031930092BF67 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				FE0935D81E8031930092BF67 /* NimbusSockit.h */,
+				FE0935D91E8031930092BF67 /* SOCKit.h */,
+				FE0935DA1E8031930092BF67 /* SOCKit.m */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		FE0935DB1E8031930092BF67 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				FE0935DC1E8031930092BF67 /* SOCKitTests.m */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FE0935C91E8030B60092BF67 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE0935DD1E8031930092BF67 /* NimbusSockit.h in Headers */,
+				FE0935DE1E8031930092BF67 /* SOCKit.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FE0935CB1E8030B60092BF67 /* SOCKit iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE0935D41E8030B60092BF67 /* Build configuration list for PBXNativeTarget "SOCKit iOS" */;
+			buildPhases = (
+				FE0935C71E8030B60092BF67 /* Sources */,
+				FE0935C81E8030B60092BF67 /* Frameworks */,
+				FE0935C91E8030B60092BF67 /* Headers */,
+				FE0935CA1E8030B60092BF67 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SOCKit iOS";
+			productName = SOCKit;
+			productReference = FE0935CC1E8030B60092BF67 /* SOCKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		FE0935E41E8031F10092BF67 /* SOCKit iOS Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE0935ED1E8031F10092BF67 /* Build configuration list for PBXNativeTarget "SOCKit iOS Tests" */;
+			buildPhases = (
+				FE0935E11E8031F10092BF67 /* Sources */,
+				FE0935E21E8031F10092BF67 /* Frameworks */,
+				FE0935E31E8031F10092BF67 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE0935EC1E8031F10092BF67 /* PBXTargetDependency */,
+			);
+			name = "SOCKit iOS Tests";
+			productName = "SOCKit iOS Tests";
+			productReference = FE0935E51E8031F10092BF67 /* SOCKit.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FE0935C31E8030B60092BF67 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = NimbusKit;
+				TargetAttributes = {
+					FE0935CB1E8030B60092BF67 = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
+					};
+					FE0935E41E8031F10092BF67 = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = FE0935C61E8030B60092BF67 /* Build configuration list for PBXProject "SOCKit" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FE0935C21E8030B60092BF67;
+			productRefGroup = FE0935CD1E8030B60092BF67 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FE0935CB1E8030B60092BF67 /* SOCKit iOS */,
+				FE0935E41E8031F10092BF67 /* SOCKit iOS Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FE0935CA1E8030B60092BF67 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE0935E31E8031F10092BF67 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FE0935C71E8030B60092BF67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE0935DF1E8031930092BF67 /* SOCKit.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE0935E11E8031F10092BF67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE0935F11E80325C0092BF67 /* SOCKitTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE0935EC1E8031F10092BF67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE0935CB1E8030B60092BF67 /* SOCKit iOS */;
+			targetProxy = FE0935EB1E8031F10092BF67 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FE0935D21E8030B60092BF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = SOCKit;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		FE0935D31E8030B60092BF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = SOCKit;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		FE0935D51E8030B60092BF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = info.nimbuskit.SOCKit;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FE0935D61E8030B60092BF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = info.nimbuskit.SOCKit;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		FE0935EE1E8031F10092BF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "info.nimbuskit.SOCKit-iOS-Tests";
+			};
+			name = Debug;
+		};
+		FE0935EF1E8031F10092BF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "info.nimbuskit.SOCKit-iOS-Tests";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FE0935C61E8030B60092BF67 /* Build configuration list for PBXProject "SOCKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE0935D21E8030B60092BF67 /* Debug */,
+				FE0935D31E8030B60092BF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE0935D41E8030B60092BF67 /* Build configuration list for PBXNativeTarget "SOCKit iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE0935D51E8030B60092BF67 /* Debug */,
+				FE0935D61E8030B60092BF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE0935ED1E8031F10092BF67 /* Build configuration list for PBXNativeTarget "SOCKit iOS Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE0935EE1E8031F10092BF67 /* Debug */,
+				FE0935EF1E8031F10092BF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FE0935C31E8030B60092BF67 /* Project object */;
+}
